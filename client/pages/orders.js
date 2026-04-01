@@ -43,15 +43,18 @@ export default function OrdersPage() {
         }
       : {};
 
-  const loadOrders = async (phone = customerSession?.phone) => {
-    if (!phone) {
+  const loadOrders = async (phone = customerSession?.phone, email = customerSession?.email) => {
+    if (!phone && !email) {
       return;
     }
 
     try {
       setIsLoading(true);
       const { data } = await api.get("/orders", {
-        params: { phone },
+        params: {
+          ...(phone ? { phone } : {}),
+          ...(email ? { email } : {})
+        },
         ...getCustomerHeaders()
       });
       setOrders(data);
@@ -63,10 +66,10 @@ export default function OrdersPage() {
   };
 
   useEffect(() => {
-    if (customerSession?.phone) {
-      loadOrders(customerSession.phone);
+    if (customerSession?.phone || customerSession?.email) {
+      loadOrders(customerSession.phone, customerSession.email);
     }
-  }, [customerSession?.phone]);
+  }, [customerSession?.phone, customerSession?.email]);
 
   const handleLogin = async (event) => {
     event.preventDefault();

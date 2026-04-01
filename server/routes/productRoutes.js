@@ -1,6 +1,4 @@
 const express = require("express");
-const auth = require("../middleware/auth");
-const adminMiddleware = require("../middleware/adminMiddleware");
 const upload = require("../utils/upload");
 const { handleUploadError } = require("../controllers/uploadController");
 const {
@@ -26,9 +24,9 @@ function runProductUpload(req, res, next) {
 
 router.get("/", getProducts);
 router.get("/:id", getProductById);
-router.post("/add", auth, adminMiddleware, runProductUpload, createProduct);
-router.post("/", auth, adminMiddleware, runProductUpload, createProduct);
-router.put("/:id", auth, adminMiddleware, runProductUpload, updateProduct);
-router.delete("/:id", auth, adminMiddleware, deleteProduct);
+router.post("/add", runProductUpload, createProduct);
+router.post("/", runProductUpload, createProduct);
+router.put("/:id", runProductUpload, updateProduct);
+router.delete("/:id", deleteProduct);
 
 module.exports = router;

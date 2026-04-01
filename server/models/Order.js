@@ -4,6 +4,7 @@ const orderSchema = new mongoose.Schema(
   {
     orderId: { type: String, required: true, unique: true },
     customer: { type: String, required: true },
+    customerEmail: { type: String, default: "", trim: true, lowercase: true },
     phone: { type: String, required: true },
     address: { type: String, required: true },
     paymentMethod: { type: String, enum: ["COD", "UPI"], required: true },

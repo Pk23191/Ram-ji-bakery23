@@ -1,5 +1,4 @@
 const Order = require("../models/Order");
-const { memoryStore } = require("../data/memoryStore");
 
 function startOfToday() {
   const now = new Date();
@@ -49,11 +48,13 @@ function buildMetrics(orders = []) {
 }
 
 async function getDashboardStats(req, res) {
-  const orders = memoryStore.dbConnected
-    ? await Order.find().sort({ createdAt: -1 })
-    : [...memoryStore.orders];
-
-  return res.json(buildMetrics(orders));
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    return res.json(buildMetrics(orders));
+  } catch (error) {
+    console.error("Dashboard load failed:", error);
+    return res.status(500).json({ message: "Unable to load dashboard" });
+  }
 }
 
 module.exports = {

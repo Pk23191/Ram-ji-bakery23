@@ -8,6 +8,7 @@ import { formatCurrency } from "../utils/helpers";
 
 export default function ProductCard({ product }) {
   const { addToCart } = useShop();
+  const showPartyDetails = ["party", "balloons", "ribbons", "candles", "hats", "banners"].includes(product.category);
 
   return (
     <motion.div
@@ -41,9 +42,14 @@ export default function ProductCard({ product }) {
         </div>
         <p className="text-sm leading-6 text-mocha/70">{product.description}</p>
         <div className="flex items-center justify-between gap-3">
-          <p className="text-lg font-extrabold text-cocoa">{formatCurrency(product.price)}</p>
+          <div>
+            <p className="text-lg font-extrabold text-cocoa">{formatCurrency(product.finalPrice ?? product.price)}</p>
+            {product.originalPrice > (product.finalPrice ?? product.price) ? (
+              <p className="text-xs text-mocha/50 line-through">{formatCurrency(product.originalPrice)}</p>
+            ) : null}
+          </div>
           <div className="flex gap-2">
-            {product.category === "party" ? (
+            {showPartyDetails ? (
               <Link href={`/party/${product._id}`} className="btn-secondary px-4 py-2">
                 View details
               </Link>

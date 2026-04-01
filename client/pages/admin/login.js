@@ -16,7 +16,7 @@ export default function AdminLoginPage() {
 
     try {
       setIsLoggingIn(true);
-      const { data } = await api.post("/auth/login", credentials);
+      const { data } = await api.post("/admin/login", credentials);
       setAdminToken(data.token);
       setAdminUser(data.admin);
       toast.success("Admin login successful");

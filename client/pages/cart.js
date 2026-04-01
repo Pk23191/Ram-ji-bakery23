@@ -4,13 +4,39 @@ import Seo from "../components/Seo";
 import SectionHeader from "../components/SectionHeader";
 import { useShop } from "../context/ShopContext";
 import { formatCurrency } from "../utils/helpers";
-import usePricingSettings from "../hooks/usePricingSettings";
 import { calculatePricingSummary } from "../utils/pricing";
+import api from "../utils/api";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 export default function CartPage() {
-  const { cart, cartTotal } = useShop();
-  const { settings } = usePricingSettings();
-  const pricing = calculatePricingSummary(cartTotal, settings);
+  const { cart, cartTotal, coupon, setCoupon } = useShop();
+  const pricing = calculatePricingSummary(cartTotal, coupon?.discountPercent || 0);
+  const [couponCode, setCouponCode] = useState(coupon?.code || "");
+  const [isApplying, setIsApplying] = useState(false);
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+
+    try {
+      setIsApplying(true);
+      const { data } = await api.post("/coupons/apply", {
+        code: couponCode.trim(),
+        subtotal: pricing.subtotal
+      });
+      setCoupon({
+        code: data.code,
+        discountPercent: data.discountPercent,
+        discountAmount: data.discountAmount
+      });
+      toast.success(`Coupon ${data.code} applied`);
+    } catch (error) {
+      setCoupon(null);
+      toast.error(error.response?.data?.message || "Invalid coupon");
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   return (
     <>
@@ -42,20 +68,46 @@ export default function CartPage() {
                 <span>Subtotal</span>
                 <span>{formatCurrency(pricing.subtotal)}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span>Delivery</span>
-                <span>{formatCurrency(pricing.deliveryCharge)}</span>
-              </div>
-              {pricing.gstEnabled ? (
-                <div className="flex items-center justify-between">
-                  <span>GST ({pricing.gstRate}%)</span>
-                  <span>{formatCurrency(pricing.gstAmount)}</span>
+              {pricing.discountAmount ? (
+                <div className="flex items-center justify-between text-emerald-700">
+                  <span>Coupon ({coupon?.code || "Applied"})</span>
+                  <span>-{formatCurrency(pricing.discountAmount)}</span>
                 </div>
               ) : null}
+              <div className="flex items-center justify-between">
+                <span>Delivery</span>
+                <span className="font-semibold text-emerald-700">Free Delivery</span>
+              </div>
               <div className="flex items-center justify-between border-t border-caramel/15 pt-4 text-base font-semibold text-cocoa">
                 <span>Total</span>
                 <span>{formatCurrency(pricing.total)}</span>
               </div>
+            </div>
+            <div className="mt-5 space-y-3">
+              <p className="text-xs uppercase tracking-[0.28em] text-caramel">Have a coupon?</p>
+              <div className="flex gap-2">
+                <input
+                  className="soft-input"
+                  placeholder="Enter coupon code"
+                  value={couponCode}
+                  onChange={(event) => setCouponCode(event.target.value)}
+                />
+                <button className="btn-secondary" type="button" onClick={applyCoupon} disabled={isApplying}>
+                  {isApplying ? "Applying..." : "Apply"}
+                </button>
+              </div>
+              {coupon ? (
+                <button
+                  className="text-xs font-semibold text-rose-600"
+                  type="button"
+                  onClick={() => {
+                    setCoupon(null);
+                    setCouponCode("");
+                  }}
+                >
+                  Remove coupon
+                </button>
+              ) : null}
             </div>
             <Link href="/checkout" className="btn-primary mt-6 w-full">
               Proceed to Checkout

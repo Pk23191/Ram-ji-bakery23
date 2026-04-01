@@ -23,6 +23,7 @@ export default function Footer() {
           <p className="font-semibold">Quick Links</p>
           <div className="mt-4 flex flex-col gap-3 text-sm text-cream/70">
             <Link href="/menu">Menu</Link>
+            <Link href="/cakes">Cakes</Link>
             <Link href="/orders">Orders</Link>
             <Link href="/customize-cake">Customize Cake</Link>
             <Link href="/track-order">Track Order</Link>

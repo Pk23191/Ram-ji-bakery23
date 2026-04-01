@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { defaultCustomization, products } from "../data/site";
-import { setAdminAuthToken } from "../utils/api";
-import { calculateCartTotal } from "../utils/helpers";
+import { defaultCustomization, normalizeProduct } from "../data/site";
+import api, { setAdminAuthToken } from "../utils/api";
+import { calculateCartTotal, getUnitPrice } from "../utils/helpers";
 
 const ShopContext = createContext();
 
@@ -23,6 +23,8 @@ export function ShopProvider({ children }) {
   const [adminToken, setAdminToken] = useState("");
   const [adminUser, setAdminUser] = useState(null);
   const [customerSession, setCustomerSession] = useState(null);
+  const [catalogProducts, setCatalogProducts] = useState([]);
+  const [coupon, setCoupon] = useState(null);
 
   useEffect(() => {
     const savedCart = window.localStorage.getItem("ramji-cart");
@@ -31,6 +33,7 @@ export function ShopProvider({ children }) {
     const savedToken = window.localStorage.getItem("ramji-admin-token");
     const savedAdminUser = window.localStorage.getItem("ramji-admin-user");
     const savedCustomerSession = window.localStorage.getItem("ramji-customer-session");
+    const savedCoupon = window.localStorage.getItem("ramji-coupon");
 
     if (savedCart) {
       setCart(JSON.parse(savedCart));
@@ -50,6 +53,9 @@ export function ShopProvider({ children }) {
     }
     if (savedCustomerSession) {
       setCustomerSession(JSON.parse(savedCustomerSession));
+    }
+    if (savedCoupon) {
+      setCoupon(JSON.parse(savedCoupon));
     }
   }, []);
 
@@ -86,6 +92,37 @@ export function ShopProvider({ children }) {
     }
   }, [customerSession]);
 
+  useEffect(() => {
+    if (coupon) {
+      window.localStorage.setItem("ramji-coupon", JSON.stringify(coupon));
+    } else {
+      window.localStorage.removeItem("ramji-coupon");
+    }
+  }, [coupon]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadCatalogProducts() {
+      try {
+        const { data } = await api.get("/products");
+        if (active) {
+          setCatalogProducts(Array.isArray(data) ? data.map((product) => normalizeProduct(product)) : []);
+        }
+      } catch (error) {
+        if (active) {
+          setCatalogProducts([]);
+        }
+      }
+    }
+
+    loadCatalogProducts();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const addPreference = (label) => {
     setUserPreferences((prev) => {
       const next = [...prev, label];
@@ -94,6 +131,7 @@ export function ShopProvider({ children }) {
   };
 
   const addToCart = (product, quantity = 1, customizations = null) => {
+    const unitPrice = getUnitPrice(product);
     setCart((prev) => {
       const existing = prev.find(
         (item) =>
@@ -112,6 +150,10 @@ export function ShopProvider({ children }) {
         {
           ...product,
           cartItemId: `${product._id}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          price: unitPrice,
+          finalPrice: unitPrice,
+          originalPrice: product.originalPrice ?? product.price ?? unitPrice,
+          discountPercent: product.discountPercent || 0,
           quantity,
           customizations
         }
@@ -141,6 +183,7 @@ export function ShopProvider({ children }) {
     const newOrder = {
       id: orderData.orderId || `RB${Math.floor(Math.random() * 9000 + 1000)}`,
       customer: orderData.customer || orderData.name,
+      customerEmail: orderData.customerEmail || customerSession?.email || "",
       phone: orderData.phone || customerSession?.phone || "",
       status: orderData.status || "Pending",
       total: orderData.total ?? calculateCartTotal(cart),
@@ -174,7 +217,7 @@ export function ShopProvider({ children }) {
     );
   };
 
-  const recommendedProducts = products.filter((product) =>
+  const recommendedProducts = catalogProducts.filter((product) =>
     userPreferences.some(
       (entry) =>
         entry.toLowerCase().includes(product.category.toLowerCase().split(" ")[0]) ||
@@ -195,13 +238,15 @@ export function ShopProvider({ children }) {
         updateOrderInState,
         customCake,
         setCustomCake,
-        recommendedProducts: recommendedProducts.length ? recommendedProducts : products.slice(0, 3),
+        recommendedProducts: recommendedProducts.length ? recommendedProducts : catalogProducts.slice(0, 3),
         adminToken,
         setAdminToken,
         adminUser,
         setAdminUser,
         customerSession,
-        setCustomerSession
+        setCustomerSession,
+        coupon,
+        setCoupon
       }}
     >
       {children}

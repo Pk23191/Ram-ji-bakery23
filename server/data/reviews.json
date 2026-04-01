@@ -1,0 +1,14 @@
+[
+  {
+    "_id": "1775053960883-8nro1e",
+    "productId": "1775048474909-aw5eah",
+    "userId": "cust-8269886676",
+    "rating": 5,
+    "comment": "nice  website",
+    "createdAt": "2026-04-01T14:32:40.883Z",
+    "user": {
+      "_id": "cust-8269886676",
+      "name": "rohit"
+    }
+  }
+]

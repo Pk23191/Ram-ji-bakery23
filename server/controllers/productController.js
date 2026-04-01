@@ -1,5 +1,7 @@
-const Product = require("../models/Product");
-const { memoryStore } = require("../data/memoryStore");
+const path = require("path");
+const { readJson, writeJson } = require("../utils/fileStore");
+
+const PRODUCTS_FILE = path.join(__dirname, "..", "data", "products.json");
 
 function normalizeCategory(category = "") {
   const value = String(category).trim().toLowerCase();
@@ -7,6 +9,11 @@ function normalizeCategory(category = "") {
   if (["cake", "cakes"].includes(value)) return "cake";
   if (["pastry", "pastries", "bread", "breads"].includes(value)) return "pastry";
   if (["party", "birthday items", "birthday item", "birthday", "decor"].includes(value)) return "party";
+  if (["balloon", "balloons"].includes(value)) return "balloons";
+  if (["ribbon", "ribbons"].includes(value)) return "ribbons";
+  if (["candle", "candles"].includes(value)) return "candles";
+  if (["hat", "hats"].includes(value)) return "hats";
+  if (["banner", "banners"].includes(value)) return "banners";
 
   return value;
 }
@@ -30,6 +37,16 @@ function getCategoryAliases(category) {
         "Birthday",
         "Decor"
       ];
+    case "balloons":
+      return ["balloons", "balloon", "Balloons", "Balloon"];
+    case "ribbons":
+      return ["ribbons", "ribbon", "Ribbons", "Ribbon"];
+    case "candles":
+      return ["candles", "candle", "Candles", "Candle"];
+    case "hats":
+      return ["hats", "hat", "Hats", "Hat"];
+    case "banners":
+      return ["banners", "banner", "Banners", "Banner"];
     default:
       return [];
   }
@@ -101,112 +118,134 @@ function normalizeProductPayload(body = {}, options = {}) {
     colors,
     description: body.description || "",
     price: Number(body.price),
+    discountPercent: Math.min(Math.max(Number(body.discountPercent || 0), 0), 90),
     badge: body.badge || "Admin Added",
     rating: Number(body.rating || 4.7)
   };
 }
 
 async function getProducts(req, res) {
-  const category = normalizeCategory(req.query.category);
-  const products = memoryStore.dbConnected
-    ? await Product.find(
-        category ? { category: { $in: getCategoryAliases(category) } } : {}
-      ).sort({ createdAt: -1 })
-    : [...memoryStore.products]
-        .reverse()
-        .filter((product) => !category || normalizeCategory(product.category) === category);
+  try {
+    const category = normalizeCategory(req.query.category);
+    const products = await readJson(PRODUCTS_FILE, []);
+    const filtered = category
+      ? products.filter((product) => getCategoryAliases(category).includes(product.category))
+      : products;
 
-  res.json(products);
+    return res.json(filtered);
+  } catch (error) {
+    console.error("Get products failed:", error);
+    return res.status(500).json({ message: "Unable to load products" });
+  }
 }
 
 async function getProductById(req, res) {
-  const product = memoryStore.dbConnected
-    ? await Product.findById(req.params.id)
-    : memoryStore.products.find((item) => String(item._id) === req.params.id);
+  try {
+    const products = await readJson(PRODUCTS_FILE, []);
+    const product = products.find((item) => String(item._id) === String(req.params.id));
 
-  if (!product) {
-    return res.status(404).json({ message: "Product not found" });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.json(product);
+  } catch (error) {
+    console.error("Get product failed:", error);
+    return res.status(500).json({ message: "Unable to load product" });
   }
-
-  return res.json(product);
 }
 
 async function createProduct(req, res) {
-  const payload = normalizeProductPayload(req.body, {
-    uploadedImages: buildUploadedFileUrls(req, req.files || [])
-  });
+  try {
+    console.log("Create product payload:", {
+      name: req.body?.name,
+      category: req.body?.category,
+      price: req.body?.price
+    });
+    const payload = normalizeProductPayload(req.body, {
+      uploadedImages: buildUploadedFileUrls(req, req.files || [])
+    });
 
-  if (!payload.images.length) {
-    return res.status(400).json({ message: "Please add at least one product image." });
+    if (!payload.images.length) {
+      return res.status(400).json({ message: "Please add at least one product image." });
+    }
+
+    const products = await readJson(PRODUCTS_FILE, []);
+    const product = {
+      ...payload,
+      _id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    products.unshift(product);
+    await writeJson(PRODUCTS_FILE, products);
+
+    return res.status(201).json(product);
+  } catch (error) {
+    console.error("Create product failed:", error);
+    return res.status(500).json({ message: "Unable to save product" });
   }
-
-  const product = memoryStore.dbConnected
-    ? await Product.create(payload)
-    : { ...payload, _id: `memory-product-${Date.now()}` };
-
-  if (!memoryStore.dbConnected) {
-    memoryStore.products.unshift(product);
-  }
-
-  res.status(201).json(product);
 }
 
 async function updateProduct(req, res) {
-  const currentProduct = memoryStore.dbConnected
-    ? await Product.findById(req.params.id)
-    : memoryStore.products.find((item) => String(item._id) === req.params.id);
+  try {
+    const products = await readJson(PRODUCTS_FILE, []);
+    const index = products.findIndex((item) => String(item._id) === String(req.params.id));
+    const currentProduct = index >= 0 ? products[index] : null;
 
-  if (!currentProduct) {
-    return res.status(404).json({ message: "Product not found" });
-  }
-
-  const currentImages = parseMultiValue(req.body.existingImages);
-  const payload = normalizeProductPayload(
-    {
-      ...(currentProduct.toObject ? currentProduct.toObject() : currentProduct),
-      ...req.body
-    },
-    {
-      uploadedImages: buildUploadedFileUrls(req, req.files || []),
-      existingImages: currentImages.length ? currentImages : currentProduct.images || []
+    if (!currentProduct) {
+      return res.status(404).json({ message: "Product not found" });
     }
-  );
 
-  if (!payload.images.length) {
-    return res.status(400).json({ message: "Please keep or add at least one product image." });
+    const currentImages = parseMultiValue(req.body.existingImages);
+    const payload = normalizeProductPayload(
+      {
+        ...(currentProduct.toObject ? currentProduct.toObject() : currentProduct),
+        ...req.body
+      },
+      {
+        uploadedImages: buildUploadedFileUrls(req, req.files || []),
+        existingImages: currentImages.length ? currentImages : currentProduct.images || []
+      }
+    );
+
+    if (!payload.images.length) {
+      return res.status(400).json({ message: "Please keep or add at least one product image." });
+    }
+
+    const updatedProduct = {
+      ...currentProduct,
+      ...payload,
+      updatedAt: new Date().toISOString()
+    };
+    products[index] = updatedProduct;
+    await writeJson(PRODUCTS_FILE, products);
+
+    return res.json(updatedProduct);
+  } catch (error) {
+    console.error("Update product failed:", error);
+    return res.status(500).json({ message: "Unable to update product" });
   }
-
-  const product = memoryStore.dbConnected
-    ? await Product.findByIdAndUpdate(req.params.id, payload, { new: true, runValidators: true })
-    : (() => {
-        const index = memoryStore.products.findIndex((item) => String(item._id) === req.params.id);
-        if (index === -1) return null;
-        memoryStore.products[index] = { ...memoryStore.products[index], ...payload };
-        return memoryStore.products[index];
-      })();
-
-  if (!product) {
-    return res.status(404).json({ message: "Product not found" });
-  }
-
-  return res.json(product);
 }
 
 async function deleteProduct(req, res) {
-  const product = memoryStore.dbConnected
-    ? await Product.findByIdAndDelete(req.params.id)
-    : (() => {
-        const index = memoryStore.products.findIndex((item) => String(item._id) === req.params.id);
-        if (index === -1) return null;
-        const [removed] = memoryStore.products.splice(index, 1);
-        return removed;
-      })();
+  try {
+    const products = await readJson(PRODUCTS_FILE, []);
+    const index = products.findIndex((item) => String(item._id) === String(req.params.id));
+    const product = index >= 0 ? products[index] : null;
 
-  if (!product) {
-    return res.status(404).json({ message: "Product not found" });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    products.splice(index, 1);
+    await writeJson(PRODUCTS_FILE, products);
+
+    return res.json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error("Delete product failed:", error);
+    return res.status(500).json({ message: "Unable to delete product" });
   }
-
-  return res.json({ message: "Product deleted successfully" });
 }
 
 module.exports = { getProducts, getProductById, createProduct, updateProduct, deleteProduct };

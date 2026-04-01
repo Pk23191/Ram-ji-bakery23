@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { normalizeCategory, normalizeProduct, products as fallbackProducts } from "../data/site";
+import { normalizeProduct } from "../data/site";
 import api from "../utils/api";
 
 export default function useProducts(category = "") {
-  const [products, setProducts] = useState(fallbackProducts);
+  const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
     setIsLoading(true);
+    setError("");
 
     async function loadProducts() {
       try {
@@ -19,17 +21,16 @@ export default function useProducts(category = "") {
           ? data.map((product) => normalizeProduct(product))
           : [];
 
-        if (active && normalizedProducts.length) {
+        if (active) {
           setProducts(normalizedProducts);
-        } else if (active) {
-          setProducts(
-            fallbackProducts.filter((product) => !category || normalizeCategory(product.category) === category)
-          );
         }
       } catch (error) {
-        setProducts(
-          fallbackProducts.filter((product) => !category || normalizeCategory(product.category) === category)
-        );
+        console.error("Products API error:", error);
+        const message = error?.response?.data?.message || "Unable to load products";
+        if (active) {
+          setProducts([]);
+          setError(message);
+        }
       } finally {
         if (active) {
           setIsLoading(false);
@@ -44,5 +45,5 @@ export default function useProducts(category = "") {
     };
   }, [category]);
 
-  return { products, isLoading };
+  return { products, isLoading, error };
 }

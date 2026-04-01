@@ -26,8 +26,14 @@ export const getOrderStatusColor = (status) => {
   }
 };
 
+export const getUnitPrice = (item) => {
+  if (item?.finalPrice != null) return Number(item.finalPrice);
+  if (item?.discountedPrice != null) return Number(item.discountedPrice);
+  return Number(item?.price || 0);
+};
+
 export const calculateCartTotal = (items) =>
-  items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  items.reduce((sum, item) => sum + getUnitPrice(item) * Number(item.quantity || 0), 0);
 
 export const createSlug = (value) =>
   value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");

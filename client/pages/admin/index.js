@@ -5,7 +5,7 @@ import AdminGuard from "../../components/AdminGuard";
 import Seo from "../../components/Seo";
 import SectionHeader from "../../components/SectionHeader";
 import { useShop } from "../../context/ShopContext";
-import { categoryLabels, normalizeCategory, normalizeProduct } from "../../data/site";
+import { categoryLabels, normalizeCategory, normalizeProduct, productCategories } from "../../data/site";
 import api from "../../utils/api";
 import {
   canCancelOrder,
@@ -18,6 +18,7 @@ import {
 const emptyForm = {
   name: "",
   price: "",
+  discountPercent: "",
   category: "cake",
   existingImages: [],
   imageUrls: [""],
@@ -50,10 +51,13 @@ export default function AdminDashboardPage() {
   const [adminsLoading, setAdminsLoading] = useState(false);
   const [adminForm, setAdminForm] = useState({ email: "", password: "", role: "admin" });
   const [adminSaving, setAdminSaving] = useState(false);
+  const [coupons, setCoupons] = useState([]);
+  const [couponsLoading, setCouponsLoading] = useState(false);
+  const [couponForm, setCouponForm] = useState({ code: "", discountPercent: "" });
+  const [couponSaving, setCouponSaving] = useState(false);
   const [selectedFilePreviews, setSelectedFilePreviews] = useState([]);
-  const [pricingSettings, setPricingSettings] = useState({ gstEnabled: false, gstRate: 18 });
-  const [pricingSettingsLoading, setPricingSettingsLoading] = useState(true);
-  const [pricingSettingsSaving, setPricingSettingsSaving] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
 
   const loadDashboard = async () => {
     try {
@@ -64,20 +68,6 @@ export default function AdminDashboardPage() {
       toast.error("Unable to load dashboard");
     } finally {
       setDashboardLoading(false);
-    }
-  };
-  const loadPricingSettings = async () => {
-    try {
-      setPricingSettingsLoading(true);
-      const { data } = await api.get("/settings");
-      setPricingSettings({
-        gstEnabled: Boolean(data?.gstEnabled),
-        gstRate: Number(data?.gstRate || 0)
-      });
-    } catch (error) {
-      toast.error("Unable to load GST settings");
-    } finally {
-      setPricingSettingsLoading(false);
     }
   };
   const loadProducts = async () => {
@@ -119,15 +109,28 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const loadCoupons = async () => {
+    try {
+      setCouponsLoading(true);
+      const { data } = await api.get("/coupons");
+      setCoupons(Array.isArray(data) ? data : []);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to load coupons");
+    } finally {
+      setCouponsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!adminToken) {
       return;
     }
 
     loadDashboard();
-    loadPricingSettings();
     loadProducts();
     loadOrders();
+    loadUsers();
+    loadCoupons();
   }, [adminToken]);
 
   useEffect(() => {
@@ -264,6 +267,7 @@ export default function AdminDashboardPage() {
     const payload = new FormData();
     payload.append("name", formData.name.trim());
     payload.append("price", formData.price);
+    payload.append("discountPercent", formData.discountPercent);
     payload.append("category", formData.category);
     payload.append("description", formData.description.trim());
     payload.append("colors", JSON.stringify(colors));
@@ -321,6 +325,7 @@ export default function AdminDashboardPage() {
     setFormData({
       name: product.name || "",
       price: product.price || "",
+      discountPercent: product.discountPercent ?? "",
       category: normalizeCategory(product.category) || "cake",
       existingImages: Array.isArray(product.images) ? product.images.slice(0, 4) : [],
       imageUrls: [""],
@@ -414,19 +419,65 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handlePricingSettingsSave = async () => {
+  const handleCreateCoupon = async (event) => {
+    event.preventDefault();
+
     try {
-      setPricingSettingsSaving(true);
-      const { data } = await api.post("/settings", pricingSettings);
-      setPricingSettings({
-        gstEnabled: Boolean(data.settings?.gstEnabled),
-        gstRate: Number(data.settings?.gstRate || 0)
+      setCouponSaving(true);
+      await api.post("/coupons", {
+        code: couponForm.code,
+        discountPercent: Number(couponForm.discountPercent || 0)
       });
-      toast.success("GST settings updated successfully");
+      toast.success("Coupon created");
+      setCouponForm({ code: "", discountPercent: "" });
+      loadCoupons();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Unable to update GST settings");
+      toast.error(error.response?.data?.message || "Unable to create coupon");
     } finally {
-      setPricingSettingsSaving(false);
+      setCouponSaving(false);
+    }
+  };
+
+  const handleDeleteCoupon = async (code) => {
+    try {
+      await api.delete(`/coupons/${encodeURIComponent(code)}`);
+      toast.success("Coupon deleted");
+      loadCoupons();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to delete coupon");
+    }
+  };
+
+
+  const loadUsers = async () => {
+    try {
+      setUsersLoading(true);
+      const { data } = await api.get("/users");
+      setUsers(Array.isArray(data) ? data : []);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to load users");
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    try {
+      await api.delete(`/users/${userId}`);
+      toast.success("User deleted");
+      loadUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to delete user");
+    }
+  };
+
+  const handleRoleUpdate = async (userId, role) => {
+    try {
+      await api.patch(`/users/${userId}/role`, { role });
+      toast.success("User role updated");
+      loadUsers();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to update user role");
     }
   };
 
@@ -497,57 +548,6 @@ export default function AdminDashboardPage() {
           </div>
         ) : null}
 
-        <div className="glass-panel mb-8 p-6">
-          <SectionHeader
-            eyebrow="Pricing settings"
-            title="Control GST from the admin panel"
-            description="Turn GST on or off anytime and update the current tax rate without changing code."
-          />
-          <div className="mt-6 grid gap-4 md:grid-cols-[220px_220px_auto] md:items-end">
-            <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-cocoa">GST Status</span>
-              <button
-                type="button"
-                onClick={() =>
-                  setPricingSettings((prev) => ({
-                    ...prev,
-                    gstEnabled: !prev.gstEnabled
-                  }))
-                }
-                className={`inline-flex w-full items-center justify-between rounded-[20px] border px-4 py-3 text-sm font-semibold transition ${
-                  pricingSettings.gstEnabled
-                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                    : "border-stone-200 bg-white text-stone-600"
-                }`}
-                disabled={pricingSettingsLoading}
-              >
-                <span>{pricingSettings.gstEnabled ? "Enabled" : "Disabled"}</span>
-                <span>{pricingSettings.gstEnabled ? "ON" : "OFF"}</span>
-              </button>
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-cocoa">GST Rate (%)</span>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                step="0.01"
-                className="soft-input"
-                value={pricingSettings.gstRate}
-                onChange={(event) =>
-                  setPricingSettings((prev) => ({
-                    ...prev,
-                    gstRate: event.target.value
-                  }))
-                }
-                disabled={pricingSettingsLoading}
-              />
-            </label>
-            <button className="btn-primary" onClick={handlePricingSettingsSave} disabled={pricingSettingsLoading || pricingSettingsSaving}>
-              {pricingSettingsSaving ? "Saving..." : "Save GST Settings"}
-            </button>
-          </div>
-        </div>
         <div className="grid gap-8 xl:grid-cols-[0.95fr_1.05fr]">
           <div className="glass-panel h-fit p-6">
             <SectionHeader
@@ -559,12 +559,13 @@ export default function AdminDashboardPage() {
             <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
               {[
                 { key: "name", label: "Product Name", type: "text", placeholder: "Chocolate Cake" },
-                { key: "price", label: "Price", type: "number", placeholder: "499" }
+                { key: "price", label: "Price", type: "number", placeholder: "499" },
+                { key: "discountPercent", label: "Discount (%)", type: "number", placeholder: "10" }
               ].map((field) => (
                 <label key={field.key} className="block">
                   <span className="mb-2 block text-sm font-semibold text-cocoa">{field.label}</span>
                   <input
-                    required={field.key !== "description"}
+                    required={field.key !== "description" && field.key !== "discountPercent"}
                     type={field.type}
                     className="soft-input"
                     value={formData[field.key]}
@@ -672,7 +673,7 @@ export default function AdminDashboardPage() {
                   value={formData.category}
                   onChange={(event) => handleChange("category", event.target.value)}
                 >
-                  {["cake", "pastry", "party"].map((item) => (
+                  {productCategories.map((item) => (
                     <option key={item} value={item}>
                       {categoryLabels[item] || item}
                     </option>
@@ -792,7 +793,10 @@ export default function AdminDashboardPage() {
                           {categoryLabels[product.category] || product.category}
                         </p>
                         <h3 className="mt-1 font-semibold text-cocoa">{product.name}</h3>
-                        <p className="mt-1 text-sm text-mocha/70">{formatCurrency(product.price)}</p>
+                        <p className="mt-1 text-sm text-mocha/70">{formatCurrency(product.finalPrice ?? product.price)}</p>
+                        {product.discountPercent ? (
+                          <p className="mt-1 text-xs text-emerald-700">{product.discountPercent}% off</p>
+                        ) : null}
                         <p className="mt-1 text-xs text-mocha/55">
                           {product.images?.length || 0} images | {product.colors?.length || 0} color variants
                         </p>
@@ -1005,7 +1009,7 @@ export default function AdminDashboardPage() {
                   ) : (
                     admins.map((admin) => (
                       <div
-                        key={admin._id}
+                        key={admin.id}
                         className="flex flex-col gap-3 rounded-[24px] border border-white/60 bg-white/80 p-4 sm:flex-row sm:items-center sm:justify-between"
                       >
                         <div>
@@ -1015,7 +1019,7 @@ export default function AdminDashboardPage() {
                         {admin.role !== "superadmin" ? (
                           <button
                             className="rounded-full border border-rose/30 px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"
-                            onClick={() => handleDeleteAdmin(admin._id)}
+                            onClick={() => handleDeleteAdmin(admin.id)}
                           >
                             Remove Admin
                           </button>
@@ -1026,6 +1030,105 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             ) : null}
+
+            <div className="glass-panel p-6">
+              <SectionHeader
+                eyebrow="Coupons"
+                title="Manage discount coupons"
+                description="Create percentage coupons for seasonal offers and remove old codes anytime."
+              />
+
+              <form className="mt-6 grid gap-3 md:grid-cols-[1fr_180px_auto]" onSubmit={handleCreateCoupon}>
+                <input
+                  className="soft-input"
+                  placeholder="RAMJI10"
+                  value={couponForm.code}
+                  onChange={(event) => setCouponForm((prev) => ({ ...prev, code: event.target.value }))}
+                />
+                <input
+                  className="soft-input"
+                  type="number"
+                  placeholder="10"
+                  value={couponForm.discountPercent}
+                  onChange={(event) => setCouponForm((prev) => ({ ...prev, discountPercent: event.target.value }))}
+                />
+                <button className="btn-primary" disabled={couponSaving}>
+                  {couponSaving ? "Saving..." : "Add Coupon"}
+                </button>
+              </form>
+
+              <div className="mt-6 grid gap-4">
+                {couponsLoading ? (
+                  <div className="rounded-[24px] bg-latte/30 p-4 text-sm text-mocha/70">Loading coupons...</div>
+                ) : coupons.length ? (
+                  coupons.map((coupon) => (
+                    <div
+                      key={coupon.code}
+                      className="flex flex-col gap-3 rounded-[24px] border border-white/60 bg-white/80 p-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div>
+                        <p className="font-semibold text-cocoa">{coupon.code}</p>
+                        <p className="text-sm text-mocha/60">{coupon.discountPercent}% off</p>
+                      </div>
+                      <button
+                        className="rounded-full border border-rose/30 px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"
+                        onClick={() => handleDeleteCoupon(coupon.code)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-[24px] bg-latte/30 p-4 text-sm text-mocha/70">No coupons created yet.</div>
+                )}
+              </div>
+            </div>
+
+            <div className="glass-panel p-6">
+              <SectionHeader
+                eyebrow="Customer accounts"
+                title="Manage customer accounts"
+                description="View customer accounts, verify status, and control account roles."
+              />
+              {usersLoading ? (
+                <div className="rounded-[24px] bg-latte/30 p-4 text-sm text-mocha/70">Loading users...</div>
+              ) : users.length ? (
+                <div className="mt-6 grid gap-4">
+                  {users.map((user) => (
+                    <div
+                      key={user.id}
+                      className="flex flex-col gap-3 rounded-[24px] border border-white/60 bg-white/80 p-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div>
+                        <p className="font-semibold text-cocoa">{user.name}</p>
+                        <p className="text-sm text-mocha/60">{user.email}</p>
+                        <p className="text-xs text-mocha/60">Status: {user.emailVerified ? "Verified" : "Unverified"}</p>
+                      </div>
+                      <div className="flex flex-wrap gap-3">
+                        {adminUser?.role === "superadmin" ? (
+                          <select
+                            className="soft-input"
+                            value={user.role}
+                            onChange={(event) => handleRoleUpdate(user.id, event.target.value)}
+                          >
+                            <option value="customer">Customer</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                        ) : null}
+                        <button
+                          className="rounded-full border border-rose/30 px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"
+                          onClick={() => handleDeleteUser(user.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-[24px] bg-latte/30 p-4 text-sm text-mocha/70">No users found.</div>
+              )}
+            </div>
           </div>
         </div>
       </section>

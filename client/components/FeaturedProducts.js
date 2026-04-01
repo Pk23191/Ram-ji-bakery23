@@ -4,7 +4,7 @@ import ProductCard from "./ProductCard";
 import SectionHeader from "./SectionHeader";
 
 export default function FeaturedProducts() {
-  const { products } = useProducts();
+  const { products, error } = useProducts();
 
   return (
     <section className="section-shell py-20">
@@ -18,11 +18,17 @@ export default function FeaturedProducts() {
           Explore Full Menu
         </Link>
       </div>
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {products.slice(0, 3).map((product) => (
-          <ProductCard key={product._id} product={product} />
-        ))}
-      </div>
+      {error ? (
+        <div className="glass-panel border border-rose/20 bg-rose/5 p-5 text-sm text-rose-700">
+          {error}
+        </div>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {products.slice(0, 3).map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

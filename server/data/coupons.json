@@ -1,0 +1,14 @@
+[
+  {
+    "code": "PIYUSH43",
+    "discountPercent": 30,
+    "active": true,
+    "createdAt": "2026-04-01T14:28:57.938Z"
+  },
+  {
+    "code": "RAMJI10",
+    "discountPercent": 10,
+    "active": true,
+    "expiresAt": "2030-12-31T23:59:59.000Z"
+  }
+]

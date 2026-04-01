@@ -5,16 +5,14 @@ import { useRouter } from "next/router";
 import Seo from "../components/Seo";
 import SectionHeader from "../components/SectionHeader";
 import { useShop } from "../context/ShopContext";
-import usePricingSettings from "../hooks/usePricingSettings";
 import api from "../utils/api";
 import { calculatePricingSummary } from "../utils/pricing";
 import { formatCurrency } from "../utils/helpers";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, cartTotal, placeOrder, customerSession, setCustomerSession } = useShop();
-  const { settings } = usePricingSettings();
-  const pricing = calculatePricingSummary(cartTotal, settings);
+  const { cart, cartTotal, placeOrder, customerSession, setCustomerSession, coupon } = useShop();
+  const pricing = calculatePricingSummary(cartTotal, coupon?.discountPercent || 0);
   const [formData, setFormData] = useState({
     name: customerSession?.name || "",
     phone: customerSession?.phone || "",
@@ -52,12 +50,19 @@ export default function CheckoutPage() {
 
     const orderPayload = {
       customer: trimmedName,
+      customerEmail: customerSession?.email || "",
       phone: trimmedPhone,
       address: trimmedAddress,
       paymentMethod: formData.paymentMethod,
       status: "Pending",
       orderTime: new Date().toISOString(),
+      subtotal: pricing.subtotal,
+      discountPercent: coupon?.discountPercent || 0,
+      discountAmount: pricing.discountAmount || 0,
+      couponCode: coupon?.code || "",
+      total: pricing.total,
       behaviorTags: cart.flatMap((item) => [item.category, item.customizations?.flavor].filter(Boolean)),
+      total: pricing.total,
       items: cart.map((item) => ({
         productId: item._id,
         name: item.name,
@@ -200,16 +205,16 @@ export default function CheckoutPage() {
                   <span>Subtotal</span>
                   <span>{formatCurrency(pricing.subtotal)}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span>Delivery</span>
-                  <span>{formatCurrency(pricing.deliveryCharge)}</span>
-                </div>
-                {pricing.gstEnabled ? (
-                  <div className="flex items-center justify-between">
-                    <span>GST ({pricing.gstRate}%)</span>
-                    <span>{formatCurrency(pricing.gstAmount)}</span>
+                {pricing.discountAmount ? (
+                  <div className="flex items-center justify-between text-emerald-700">
+                    <span>Coupon ({coupon?.code || "Applied"})</span>
+                    <span>-{formatCurrency(pricing.discountAmount)}</span>
                   </div>
                 ) : null}
+                <div className="flex items-center justify-between">
+                  <span>Delivery</span>
+                  <span className="font-semibold text-emerald-700">Free Delivery</span>
+                </div>
                 <div className="flex items-center justify-between border-t border-caramel/15 pt-3 font-semibold text-cocoa">
                   <span>Total</span>
                   <span>{formatCurrency(pricing.total)}</span>

@@ -1,7 +1,7 @@
 import { Minus, Plus, Trash2 } from "lucide-react";
 import ProductImage from "./ProductImage";
 import { categoryLabels, normalizeCategory } from "../data/site";
-import { formatCurrency } from "../utils/helpers";
+import { formatCurrency, getUnitPrice } from "../utils/helpers";
 import { useShop } from "../context/ShopContext";
 
 export default function CartLineItem({ item }) {
@@ -12,6 +12,9 @@ export default function CartLineItem({ item }) {
         .map(([, value]) => value)
         .join(", ")
     : "";
+
+  const unitPrice = getUnitPrice(item);
+  const originalPrice = Number(item.originalPrice ?? item.price ?? unitPrice);
 
   return (
     <div className="flex flex-col gap-4 rounded-[28px] border border-white/60 bg-white/80 p-5 shadow-soft sm:flex-row sm:items-center sm:justify-between">
@@ -44,7 +47,12 @@ export default function CartLineItem({ item }) {
             <Plus size={16} />
           </button>
         </div>
-        <p className="min-w-24 text-right font-semibold text-cocoa">{formatCurrency(item.price * item.quantity)}</p>
+        <div className="min-w-24 text-right">
+          <p className="font-semibold text-cocoa">{formatCurrency(unitPrice * item.quantity)}</p>
+          {originalPrice > unitPrice ? (
+            <p className="text-xs text-mocha/50 line-through">{formatCurrency(originalPrice * item.quantity)}</p>
+          ) : null}
+        </div>
         <button
           className="rounded-full border border-rose/30 p-3 text-rose-600"
           onClick={() => removeFromCart(item.cartItemId)}

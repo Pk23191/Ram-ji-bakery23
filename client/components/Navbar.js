@@ -8,8 +8,10 @@ import { useShop } from "../context/ShopContext";
 const links = [
   { href: "/", label: "Home" },
   { href: "/menu", label: "Menu" },
+  { href: "/cakes", label: "Cakes" },
   { href: "/party", label: "Party Accessories" },
   { href: "/orders", label: "Orders" },
+  { href: "/account", label: "My Account" },
   { href: "/customize-cake", label: "Customize Cake" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" }

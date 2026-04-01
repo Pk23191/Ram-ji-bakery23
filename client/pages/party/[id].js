@@ -10,7 +10,7 @@ import SectionHeader from "../../components/SectionHeader";
 import Seo from "../../components/Seo";
 import StarRating from "../../components/StarRating";
 import { useShop } from "../../context/ShopContext";
-import { getImageUrl, normalizeProduct, products as fallbackProducts } from "../../data/site";
+import { normalizeProduct } from "../../data/site";
 import api from "../../utils/api";
 import { formatCurrency } from "../../utils/helpers";
 
@@ -59,13 +59,7 @@ export default function PartyProductDetailPage() {
           setSelectedColor(normalized.colors?.[0]?.name || "");
         }
       } catch (error) {
-        const fallback = fallbackProducts.find((item) => String(item._id) === String(id));
-
-        if (active && fallback) {
-          setProduct(fallback);
-          setSelectedImage(resolveGallery(fallback)[0] || "");
-          setSelectedColor(fallback.colors?.[0]?.name || "");
-        } else if (active) {
+        if (active) {
           toast.error("Unable to load product details");
         }
       } finally {
@@ -329,7 +323,14 @@ export default function PartyProductDetailPage() {
             <div className="mt-8 grid gap-4 rounded-[28px] bg-[#fff7ef] p-5 sm:grid-cols-3">
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-mocha/50">Price</p>
-                <p className="mt-2 text-2xl font-extrabold text-cocoa">{formatCurrency(product.price)}</p>
+                <p className="mt-2 text-2xl font-extrabold text-cocoa">
+                  {formatCurrency(product.finalPrice ?? product.price)}
+                </p>
+                {product.originalPrice > (product.finalPrice ?? product.price) ? (
+                  <p className="mt-1 text-sm text-mocha/50 line-through">{formatCurrency(product.originalPrice)}</p>
+                ) : (
+                  <p className="mt-1 text-sm text-mocha/60">Free Delivery</p>
+                )}
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.24em] text-mocha/50">Gallery</p>

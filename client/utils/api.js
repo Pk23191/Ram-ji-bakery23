@@ -1,8 +1,19 @@
 import axios from "axios";
 
+const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const baseURL = rawBaseUrl.replace(/\/+$/, "");
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+  baseURL
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error("API error:", error?.response?.status, error?.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
 
 export const setAdminAuthToken = (token) => {
   if (token) {

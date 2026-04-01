@@ -1,4 +1,15 @@
-export const categories = ["All", "cake", "pastry", "party"];
+export const productCategories = [
+  "cake",
+  "pastry",
+  "party",
+  "balloons",
+  "ribbons",
+  "candles",
+  "hats",
+  "banners"
+];
+
+export const categories = ["All", ...productCategories];
 
 export const categoryLabels = {
   cake: "Cake",
@@ -10,7 +21,17 @@ export const categoryLabels = {
   party: "Party",
   birthday: "Party",
   "birthday item": "Party",
-  "birthday items": "Party"
+  "birthday items": "Party",
+  balloons: "Balloons",
+  balloon: "Balloons",
+  ribbons: "Ribbons",
+  ribbon: "Ribbons",
+  candles: "Candles",
+  candle: "Candles",
+  hats: "Party Hats",
+  hat: "Party Hats",
+  banners: "Banners",
+  banner: "Banners"
 };
 
 export const normalizeCategory = (category = "") => {
@@ -19,6 +40,11 @@ export const normalizeCategory = (category = "") => {
   if (["cake", "cakes"].includes(value)) return "cake";
   if (["pastry", "pastries", "bread", "breads"].includes(value)) return "pastry";
   if (["party", "birthday", "birthday item", "birthday items"].includes(value)) return "party";
+  if (["balloon", "balloons"].includes(value)) return "balloons";
+  if (["ribbon", "ribbons"].includes(value)) return "ribbons";
+  if (["candle", "candles"].includes(value)) return "candles";
+  if (["hat", "hats"].includes(value)) return "hats";
+  if (["banner", "banners"].includes(value)) return "banners";
 
   return value;
 };
@@ -59,12 +85,21 @@ export const normalizeProduct = (product = {}) => {
         .filter((entry) => entry.name && entry.image)
     : [];
 
+  const discountPercent = Number(product.discountPercent || 0);
+  const normalizedDiscount = Number.isFinite(discountPercent) ? Math.min(Math.max(discountPercent, 0), 90) : 0;
+  const basePrice = Number(product.price || 0);
+  const finalPrice =
+    normalizedDiscount > 0 ? Number((basePrice - (basePrice * normalizedDiscount) / 100).toFixed(2)) : basePrice;
+
   return {
     ...product,
     category: normalizeCategory(product.category),
     image: images[0] || image,
     images: (images.length ? images : [image]).filter(Boolean).slice(0, 4),
-    colors
+    colors,
+    discountPercent: normalizedDiscount,
+    finalPrice,
+    originalPrice: basePrice
   };
 };
 

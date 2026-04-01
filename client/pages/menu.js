@@ -6,7 +6,7 @@ import { categories, categoryLabels, normalizeCategory } from "../data/site";
 import useProducts from "../hooks/useProducts";
 
 export default function MenuPage() {
-  const { products, isLoading } = useProducts();
+  const { products, isLoading, error } = useProducts();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [priceFilter, setPriceFilter] = useState("All");
@@ -61,6 +61,12 @@ export default function MenuPage() {
             ))}
           </select>
         </div>
+
+        {error ? (
+          <div className="glass-panel mt-8 border border-rose/20 bg-rose/5 p-5 text-sm text-rose-700">
+            {error}
+          </div>
+        ) : null}
 
         <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {isLoading ? (
