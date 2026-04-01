@@ -1,5 +1,14 @@
 [
   {
+    "id": "1775071379786-ag86pf",
+    "name": "Piyush",
+    "email": "bagulyapiyush@gmail.com",
+    "password": "$2a$10$.Ni5Ctg1uVaoNzOBTTr9uOogSQTqSl3Ecg9tiFgrpts5Jn2jdsDIi",
+    "role": "customer",
+    "emailVerified": false,
+    "createdAt": "2026-04-01T19:22:59.786Z"
+  },
+  {
     "id": "1775064636954-e1yz4a",
     "name": "piyush",
     "email": "admin@ramjibakery.in",

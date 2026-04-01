@@ -1,12 +1,5 @@
 [
   {
-    "id": "1775066974244-82m5sw",
-    "email": "bagulyapiyush@gmail.com",
-    "password": "$2a$10$alCJAtC07Sm70pl8Pg1JMOVLbTNnIZ5nsbtyNTXfubi.7/B/IEjMm",
-    "role": "admin",
-    "createdAt": "2026-04-01T18:09:34.244Z"
-  },
-  {
     "id": "1775051031590-6wbd3c",
     "email": "admin@ramjibakery.in",
     "password": "$2a$10$lVCei2eIWyQlzVgq1jqOtOYJ0YMvFyCCaONMabjQIt0tUvgHy6B/2",

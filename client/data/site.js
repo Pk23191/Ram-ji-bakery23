@@ -61,7 +61,10 @@ export const getImageUrl = (image = "") => {
   }
 
   if (value.startsWith("/uploads/")) {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+    const apiBase =
+      process.env.NEXT_PUBLIC_API_URL ||
+      process.env.VITE_API_URL ||
+      "https://ram-ji-bakery23.onrender.com/api";
     const backendBase = apiBase.replace(/\/api\/?$/, "");
     return `${backendBase}${value}`;
   }

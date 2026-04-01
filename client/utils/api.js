@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const rawBaseUrl =
+  process.env.NEXT_PUBLIC_API_URL ||
+  process.env.VITE_API_URL ||
+  "https://ram-ji-bakery23.onrender.com/api";
 const baseURL = rawBaseUrl.replace(/\/+$/, "");
 
 const api = axios.create({
