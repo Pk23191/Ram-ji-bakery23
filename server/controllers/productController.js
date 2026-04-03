@@ -152,8 +152,9 @@ function normalizeProductPayload(body = {}, options = {}) {
   return {
     ...body,
     category: normalizeCategory(body.category),
-    image: normalizedImages[0] || "",
-    images: normalizedImages,
+    // Ensure stored images are full URLs when possible to avoid broken links in production.
+    image: (normalizedImages[0] && makeAbsoluteUrl(normalizedImages[0])) || "",
+    images: normalizedImages.map((i) => makeAbsoluteUrl(i)),
     colors,
     description: body.description || "",
     price: Number(body.price),
@@ -161,6 +162,22 @@ function normalizeProductPayload(body = {}, options = {}) {
     badge: body.badge || "Admin Added",
     rating: Number(body.rating || 4.7)
   };
+}
+
+function makeAbsoluteUrl(value = "") {
+  const s = String(value || "").trim();
+  if (!s) return s;
+  if (/^https?:\/\//i.test(s)) return s;
+
+  // If it's a relative uploads path, prefix with BACKEND_URL or PUBLIC_API_URL (without /api)
+  const backend = process.env.BACKEND_URL || process.env.PUBLIC_API_URL || "";
+  const backendRoot = String(backend).replace(/\/(?:api)?\/?$/, "").replace(/\/$/, "");
+  if (s.startsWith("/uploads") || s.startsWith("uploads")) {
+    return backendRoot ? `${backendRoot}${s.startsWith("/") ? s : `/${s}`}` : s;
+  }
+
+  // Otherwise, return as-is (could be a data URL or external hostless path)
+  return s;
 }
 
 async function getProducts(req, res) {

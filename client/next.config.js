@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    domains: ["ram-ji-bakery23.onrender.com", "res.cloudinary.com", "images.unsplash.com"],
     remotePatterns: [
       {
         protocol: "http",
