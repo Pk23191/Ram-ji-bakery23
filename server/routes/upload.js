@@ -1,26 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const path = require("path");
+const { memoryUpload } = require("../utils/upload");
+const { uploadSingleImage, handleUploadError } = require("../controllers/uploadController");
 
-// storage config
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({ storage });
-
-// route
-router.post("/upload", upload.single("image"), (req, res) => {
-  res.json({
-    imageUrl: `http://localhost:5000/uploads/${req.file.filename}`,
+router.post("/upload", (req, res, next) => {
+  memoryUpload.single("image")(req, res, (error) => {
+    if (error) return handleUploadError(error, req, res, next);
+    return uploadSingleImage(req, res, next);
   });
 });
 
-// 🔥 IMPORTANT (ye line hi sabse important hai)
+// Alias: accept POST to '/api/upload' as well as '/api/upload/upload'
+router.post("/", (req, res, next) => {
+  memoryUpload.single("image")(req, res, (error) => {
+    if (error) return handleUploadError(error, req, res, next);
+    return uploadSingleImage(req, res, next);
+  });
+});
+
 module.exports = router;

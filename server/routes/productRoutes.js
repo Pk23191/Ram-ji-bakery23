@@ -1,5 +1,5 @@
 const express = require("express");
-const upload = require("../utils/upload");
+const { memoryUpload } = require("../utils/upload");
 const { handleUploadError } = require("../controllers/uploadController");
 const {
   getProducts,
@@ -10,7 +10,7 @@ const {
 } = require("../controllers/productController");
 
 const router = express.Router();
-const uploadProductImages = upload.array("images", 4);
+const uploadProductImages = memoryUpload.array("images", 4);
 
 function runProductUpload(req, res, next) {
   uploadProductImages(req, res, (error) => {

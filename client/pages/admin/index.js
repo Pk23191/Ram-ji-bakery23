@@ -56,6 +56,7 @@ export default function AdminDashboardPage() {
   const [couponForm, setCouponForm] = useState({ code: "", discountPercent: "" });
   const [couponSaving, setCouponSaving] = useState(false);
   const [selectedFilePreviews, setSelectedFilePreviews] = useState([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(false);
 
@@ -158,25 +159,41 @@ export default function AdminDashboardPage() {
     const files = Array.from(event.target.files || []).slice(0, 4);
     if (!files.length) return;
 
-    setFormData((prev) => {
-      const existingCount =
-        prev.existingImages.length +
-        prev.selectedFiles.length +
-        prev.imageUrls.map((entry) => entry.trim()).filter(Boolean).length;
-      const availableSlots = Math.max(0, 4 - existingCount);
-      const nextFiles = [...prev.selectedFiles, ...files.slice(0, availableSlots)].slice(0, 4);
+    // Immediately upload selected files to backend /api/upload and store returned Cloudinary URLs
+    const uploadFiles = async () => {
+      setUploadingFiles(true);
+      try {
+        const existingCount =
+          formData.existingImages.length +
+          formData.selectedFiles.length +
+          formData.imageUrls.map((entry) => entry.trim()).filter(Boolean).length;
+        const availableSlots = Math.max(0, 4 - existingCount);
+        const toUpload = files.slice(0, availableSlots);
 
-      if (!availableSlots) {
-        toast.error("You can add up to 4 images only.");
-        return prev;
+        if (!toUpload.length) {
+          toast.error("You can add up to 4 images only.");
+          return;
+        }
+
+        for (const file of toUpload) {
+          const fd = new FormData();
+          fd.append("image", file);
+          try {
+            const { data } = await api.post("/upload", fd);
+            const url = data.secure_url || data.url || data.imageUrl || data.url;
+            if (url) {
+              setFormData((prev) => ({ ...prev, existingImages: [...prev.existingImages, url] }));
+            }
+          } catch (err) {
+            toast.error(err.response?.data?.message || "Upload failed");
+          }
+        }
+      } finally {
+        setUploadingFiles(false);
       }
+    };
 
-      return {
-        ...prev,
-        selectedFiles: nextFiles
-      };
-    });
-
+    uploadFiles();
     event.target.value = "";
   };
 

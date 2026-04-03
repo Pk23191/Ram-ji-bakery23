@@ -3,7 +3,7 @@ const path = require("path");
 const multer = require("multer");
 
 const uploadsDir = path.join(__dirname, "..", "uploads");
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB limit per requirements
 const allowedMimeTypes = new Set(["image/jpeg", "image/jpg", "image/png"]);
 
 if (!fs.existsSync(uploadsDir)) {

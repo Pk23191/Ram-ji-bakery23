@@ -6,9 +6,9 @@
     "category": "cake",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207180/ramji-bakery/products/migrate-1775201808291-download-2-1775207180582.jpg",
+    "image": "http://localhost:5000/uploads/1775201808291-download-2.jpg",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207180/ramji-bakery/products/migrate-1775201808291-download-2-1775207180582.jpg"
+      "http://localhost:5000/uploads/1775201808291-download-2.jpg"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -23,9 +23,9 @@
     "category": "party",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207179/ramji-bakery/products/migrate-1775066779119-1-1775207179855.jpg",
+    "image": "http://localhost:5000/uploads/1775066779119-1.jpeg",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207179/ramji-bakery/products/migrate-1775066779119-1-1775207179855.jpg"
+      "http://localhost:5000/uploads/1775066779119-1.jpeg"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -40,9 +40,9 @@
     "category": "hats",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207178/ramji-bakery/products/migrate-1775066709524-ChatGPT-Image-Mar-20-2026-034853-PM-1775207177233.png",
+    "image": "http://localhost:5000/uploads/1775066709524-ChatGPT-Image-Mar-20-2026-034853-PM.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207178/ramji-bakery/products/migrate-1775066709524-ChatGPT-Image-Mar-20-2026-034853-PM-1775207177233.png"
+      "http://localhost:5000/uploads/1775066709524-ChatGPT-Image-Mar-20-2026-034853-PM.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -57,9 +57,9 @@
     "category": "banners",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207176/ramji-bakery/products/migrate-1775066649449-ChatGPT-Image-Mar-20-2026-035317-PM-1-1775207176331.png",
+    "image": "http://localhost:5000/uploads/1775066649449-ChatGPT-Image-Mar-20-2026-035317-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207176/ramji-bakery/products/migrate-1775066649449-ChatGPT-Image-Mar-20-2026-035317-PM-1-1775207176331.png"
+      "http://localhost:5000/uploads/1775066649449-ChatGPT-Image-Mar-20-2026-035317-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -74,9 +74,9 @@
     "category": "party",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207175/ramji-bakery/products/migrate-1775066594039-ChatGPT-Image-Mar-20-2026-035311-PM-1775207174677.png",
+    "image": "http://localhost:5000/uploads/1775066594039-ChatGPT-Image-Mar-20-2026-035311-PM.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207175/ramji-bakery/products/migrate-1775066594039-ChatGPT-Image-Mar-20-2026-035311-PM-1775207174677.png"
+      "http://localhost:5000/uploads/1775066594039-ChatGPT-Image-Mar-20-2026-035311-PM.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -91,9 +91,9 @@
     "category": "candles",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207173/ramji-bakery/products/migrate-1775066546851-ChatGPT-Image-Mar-20-2026-035305-PM-1-1775207173740.png",
+    "image": "http://localhost:5000/uploads/1775066546851-ChatGPT-Image-Mar-20-2026-035305-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207173/ramji-bakery/products/migrate-1775066546851-ChatGPT-Image-Mar-20-2026-035305-PM-1-1775207173740.png"
+      "http://localhost:5000/uploads/1775066546851-ChatGPT-Image-Mar-20-2026-035305-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -108,9 +108,9 @@
     "category": "ribbons",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207172/ramji-bakery/products/migrate-1775066504334-ChatGPT-Image-Mar-20-2026-035243-PM-1-1775207172564.png",
+    "image": "http://localhost:5000/uploads/1775066504334-ChatGPT-Image-Mar-20-2026-035243-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207172/ramji-bakery/products/migrate-1775066504334-ChatGPT-Image-Mar-20-2026-035243-PM-1-1775207172564.png"
+      "http://localhost:5000/uploads/1775066504334-ChatGPT-Image-Mar-20-2026-035243-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -125,9 +125,9 @@
     "category": "banners",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207171/ramji-bakery/products/migrate-1775066448718-ChatGPT-Image-Mar-20-2026-035237-PM-1-1775207171242.png",
+    "image": "http://localhost:5000/uploads/1775066448718-ChatGPT-Image-Mar-20-2026-035237-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207171/ramji-bakery/products/migrate-1775066448718-ChatGPT-Image-Mar-20-2026-035237-PM-1-1775207171242.png"
+      "http://localhost:5000/uploads/1775066448718-ChatGPT-Image-Mar-20-2026-035237-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -142,9 +142,9 @@
     "category": "banners",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207170/ramji-bakery/products/migrate-1775066369769-ChatGPT-Image-Mar-20-2026-035206-PM-1-1775207170142.png",
+    "image": "http://localhost:5000/uploads/1775066369769-ChatGPT-Image-Mar-20-2026-035206-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207170/ramji-bakery/products/migrate-1775066369769-ChatGPT-Image-Mar-20-2026-035206-PM-1-1775207170142.png"
+      "http://localhost:5000/uploads/1775066369769-ChatGPT-Image-Mar-20-2026-035206-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -159,9 +159,9 @@
     "category": "candles",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207168/ramji-bakery/products/migrate-1775066339133-ChatGPT-Image-Mar-20-2026-035155-PM-1-1775207168896.png",
+    "image": "http://localhost:5000/uploads/1775066339133-ChatGPT-Image-Mar-20-2026-035155-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207168/ramji-bakery/products/migrate-1775066339133-ChatGPT-Image-Mar-20-2026-035155-PM-1-1775207168896.png"
+      "http://localhost:5000/uploads/1775066339133-ChatGPT-Image-Mar-20-2026-035155-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -176,9 +176,9 @@
     "category": "banners",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207166/ramji-bakery/products/migrate-1775066276758-ChatGPT-Image-Mar-20-2026-035112-PM-1-1775207166832.png",
+    "image": "http://localhost:5000/uploads/1775066276758-ChatGPT-Image-Mar-20-2026-035112-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207166/ramji-bakery/products/migrate-1775066276758-ChatGPT-Image-Mar-20-2026-035112-PM-1-1775207166832.png"
+      "http://localhost:5000/uploads/1775066276758-ChatGPT-Image-Mar-20-2026-035112-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -193,9 +193,9 @@
     "category": "hats",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207165/ramji-bakery/products/migrate-1775066211377-ChatGPT-Image-Mar-20-2026-035102-PM-1775207165024.png",
+    "image": "http://localhost:5000/uploads/1775066211377-ChatGPT-Image-Mar-20-2026-035102-PM.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207165/ramji-bakery/products/migrate-1775066211377-ChatGPT-Image-Mar-20-2026-035102-PM-1775207165024.png"
+      "http://localhost:5000/uploads/1775066211377-ChatGPT-Image-Mar-20-2026-035102-PM.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -210,9 +210,9 @@
     "category": "ribbons",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207164/ramji-bakery/products/migrate-1775066176727-ChatGPT-Image-Mar-20-2026-035056-PM-1-1775207164079.png",
+    "image": "http://localhost:5000/uploads/1775066176727-ChatGPT-Image-Mar-20-2026-035056-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207164/ramji-bakery/products/migrate-1775066176727-ChatGPT-Image-Mar-20-2026-035056-PM-1-1775207164079.png"
+      "http://localhost:5000/uploads/1775066176727-ChatGPT-Image-Mar-20-2026-035056-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -227,9 +227,9 @@
     "category": "candles",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207161/ramji-bakery/products/migrate-1775066127423-ChatGPT-Image-Mar-20-2026-035046-PM-1-1775207161548.png",
+    "image": "http://localhost:5000/uploads/1775066127423-ChatGPT-Image-Mar-20-2026-035046-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207161/ramji-bakery/products/migrate-1775066127423-ChatGPT-Image-Mar-20-2026-035046-PM-1-1775207161548.png"
+      "http://localhost:5000/uploads/1775066127423-ChatGPT-Image-Mar-20-2026-035046-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -244,9 +244,9 @@
     "category": "hats",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207160/ramji-bakery/products/migrate-1775066099544-ChatGPT-Image-Mar-20-2026-035040-PM-1-1775207160490.png",
+    "image": "http://localhost:5000/uploads/1775066099544-ChatGPT-Image-Mar-20-2026-035040-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207160/ramji-bakery/products/migrate-1775066099544-ChatGPT-Image-Mar-20-2026-035040-PM-1-1775207160490.png"
+      "http://localhost:5000/uploads/1775066099544-ChatGPT-Image-Mar-20-2026-035040-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -261,9 +261,9 @@
     "category": "candles",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207159/ramji-bakery/products/migrate-1775066043800-ChatGPT-Image-Mar-20-2026-035034-PM-1-1775207159508.png",
+    "image": "http://localhost:5000/uploads/1775066043800-ChatGPT-Image-Mar-20-2026-035034-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207159/ramji-bakery/products/migrate-1775066043800-ChatGPT-Image-Mar-20-2026-035034-PM-1-1775207159508.png"
+      "http://localhost:5000/uploads/1775066043800-ChatGPT-Image-Mar-20-2026-035034-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -278,9 +278,9 @@
     "category": "banners",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207158/ramji-bakery/products/migrate-1775066009722-ChatGPT-Image-Mar-20-2026-035022-PM-1-1775207158327.png",
+    "image": "http://localhost:5000/uploads/1775066009722-ChatGPT-Image-Mar-20-2026-035022-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207158/ramji-bakery/products/migrate-1775066009722-ChatGPT-Image-Mar-20-2026-035022-PM-1-1775207158327.png"
+      "http://localhost:5000/uploads/1775066009722-ChatGPT-Image-Mar-20-2026-035022-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -295,9 +295,9 @@
     "category": "candles",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207157/ramji-bakery/products/migrate-1775065954202-ChatGPT-Image-Mar-20-2026-035016-PM-1-1775207157263.png",
+    "image": "http://localhost:5000/uploads/1775065954202-ChatGPT-Image-Mar-20-2026-035016-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207157/ramji-bakery/products/migrate-1775065954202-ChatGPT-Image-Mar-20-2026-035016-PM-1-1775207157263.png"
+      "http://localhost:5000/uploads/1775065954202-ChatGPT-Image-Mar-20-2026-035016-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -312,9 +312,9 @@
     "category": "candles",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207155/ramji-bakery/products/migrate-1775065891347-ChatGPT-Image-Mar-20-2026-035009-PM-1-1775207155729.png",
+    "image": "http://localhost:5000/uploads/1775065891347-ChatGPT-Image-Mar-20-2026-035009-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207155/ramji-bakery/products/migrate-1775065891347-ChatGPT-Image-Mar-20-2026-035009-PM-1-1775207155729.png"
+      "http://localhost:5000/uploads/1775065891347-ChatGPT-Image-Mar-20-2026-035009-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -329,9 +329,9 @@
     "category": "party",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207154/ramji-bakery/products/migrate-1775065851892-ChatGPT-Image-Mar-20-2026-035001-PM-1-1775207154572.png",
+    "image": "http://localhost:5000/uploads/1775065851892-ChatGPT-Image-Mar-20-2026-035001-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207154/ramji-bakery/products/migrate-1775065851892-ChatGPT-Image-Mar-20-2026-035001-PM-1-1775207154572.png"
+      "http://localhost:5000/uploads/1775065851892-ChatGPT-Image-Mar-20-2026-035001-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -346,9 +346,9 @@
     "category": "party",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207153/ramji-bakery/products/migrate-1775065780992-ChatGPT-Image-Mar-20-2026-034954-PM-1-1775207153402.png",
+    "image": "http://localhost:5000/uploads/1775065780992-ChatGPT-Image-Mar-20-2026-034954-PM-1.png",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207153/ramji-bakery/products/migrate-1775065780992-ChatGPT-Image-Mar-20-2026-034954-PM-1-1775207153402.png"
+      "http://localhost:5000/uploads/1775065780992-ChatGPT-Image-Mar-20-2026-034954-PM-1.png"
     ],
     "badge": "Admin Added",
     "rating": 4.7,
@@ -362,9 +362,9 @@
     "category": "party",
     "description": "",
     "colors": [],
-    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207152/ramji-bakery/products/migrate-1775048474896-19-1775207152569.jpg",
+    "image": "http://localhost:5000/uploads/1775048474896-19.jpeg",
     "images": [
-      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207152/ramji-bakery/products/migrate-1775048474896-19-1775207152569.jpg"
+      "http://localhost:5000/uploads/1775048474896-19.jpeg"
     ],
     "badge": "Admin Added",
     "rating": 4.7,

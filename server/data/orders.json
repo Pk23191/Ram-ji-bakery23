@@ -1,5 +1,29 @@
 [
   {
+    "orderId": "RB607013",
+    "customer": "piyush",
+    "customerEmail": "",
+    "phone": "8269886676",
+    "address": "AAMKHO  GWALIOR",
+    "paymentMethod": "COD",
+    "status": "Pending",
+    "total": 84,
+    "items": [
+      {
+        "productId": "1775066709551-dhfjcu",
+        "name": "birthday queen cap",
+        "image": "http://localhost:5000/uploads/1775066709524-ChatGPT-Image-Mar-20-2026-034853-PM.png",
+        "category": "hats",
+        "quantity": 1,
+        "price": 120,
+        "customizations": null
+      }
+    ],
+    "orderTime": "2026-04-03T09:30:06.975Z",
+    "createdAt": "2026-04-03T09:30:07.015Z",
+    "updatedAt": "2026-04-03T09:30:07.015Z"
+  },
+  {
     "orderId": "RB085124",
     "customer": "piyush",
     "customerEmail": "admin@ramjibakery.in",

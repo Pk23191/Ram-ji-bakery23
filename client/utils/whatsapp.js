@@ -1,5 +1,5 @@
-const OWNER_WHATSAPP = "917566921100";
-const OWNER_EMAIL = "anuragsahug689@gmail.com";
+const OWNER_WHATSAPP = process.env.NEXT_PUBLIC_ORDER_NOTIFICATION_WHATSAPP || "917566921100";
+const OWNER_EMAIL = process.env.NEXT_PUBLIC_OWNER_EMAIL || "anuragsahug689@gmail.com";
 
 function buildItemsLine(items = []) {
   if (!Array.isArray(items) || items.length === 0) {
