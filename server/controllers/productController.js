@@ -149,9 +149,43 @@ async function getProducts(req, res) {
     if (!cached) {
       setProductCache(products);
     }
+    // Fix stored image URLs that point to localhost so deployed site shows images.
+    const apiRoot = (process.env.PUBLIC_API_URL || `${req.protocol}://${req.get("host")}/api`).replace(/\/api\/?$/, "").replace(/\/$/, "");
+    const fixedProducts = products.map((product) => {
+      const p = { ...product };
+      const fixUrl = (val) => {
+        if (!val) return val;
+        try {
+          const s = String(val).trim();
+
+          // If absolute URL, extract pathname and rebuild using apiRoot
+          if (/^https?:\/\//i.test(s)) {
+            try {
+              const parsed = new URL(s);
+              return `${apiRoot}/${parsed.pathname.replace(/^\/+/, "")}${parsed.search || ""}`;
+            } catch (e) {
+              return s;
+            }
+          }
+
+          // If it's a relative uploads path, prefix with apiRoot
+          if (s.startsWith("/uploads") || s.startsWith("uploads")) {
+            return `${apiRoot}/${s.replace(/^\/+/, "")}`;
+          }
+
+          return s;
+        } catch (e) {
+          return val;
+        }
+      };
+
+      p.image = fixUrl(p.image);
+      p.images = Array.isArray(p.images) ? p.images.map(fixUrl) : p.images;
+      return p;
+    });
     const filtered = category
-      ? products.filter((product) => getCategoryAliases(category).includes(product.category))
-      : products;
+      ? fixedProducts.filter((product) => getCategoryAliases(category).includes(product.category))
+      : fixedProducts;
 
     return res.json(filtered);
   } catch (error) {
@@ -169,7 +203,30 @@ async function getProductById(req, res) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    return res.json(product);
+    if (product) {
+      const apiRoot = (process.env.PUBLIC_API_URL || `${req.protocol}://${req.get("host")}/api`).replace(/\/api\/?$/, "").replace(/\/$/, "");
+      const fixUrl = (val) => {
+        if (!val) return val;
+        const s = String(val).trim();
+        if (/^https?:\/\//i.test(s)) {
+          try {
+            const parsed = new URL(s);
+            return `${apiRoot}/${parsed.pathname.replace(/^\/+/, "")}${parsed.search || ""}`;
+          } catch (e) {
+            return s;
+          }
+        }
+
+        if (s.startsWith("/uploads") || s.startsWith("uploads")) {
+          return `${apiRoot}/${s.replace(/^\/+/, "")}`;
+        }
+
+        return s;
+      };
+
+      const fixed = { ...product, image: fixUrl(product.image), images: Array.isArray(product.images) ? product.images.map(fixUrl) : product.images };
+      return res.json(fixed);
+    }
   } catch (error) {
     console.error("Get product failed:", error);
     return res.status(500).json({ message: "Unable to load product" });
