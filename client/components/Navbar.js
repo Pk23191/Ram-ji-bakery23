@@ -49,6 +49,19 @@ export default function Navbar() {
           ))}
         </nav>
 
+        {/* Mobile: show compact search and cart */}
+        <div className="flex items-center gap-3 lg:hidden">
+          <button className="rounded-full border border-white/70 p-2 bg-white/80" onClick={() => router.push('/menu')} aria-label="Search">
+            <Search size={16} className="text-caramel" />
+          </button>
+          <Link href="/cart" className="relative rounded-full bg-cocoa p-2 text-cream">
+            <ShoppingBag size={18} />
+            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose px-1 text-[10px] font-bold text-cocoa">
+              {cart.length}
+            </span>
+          </Link>
+        </div>
+
         <div className="hidden items-center gap-3 lg:flex">
           <div className="flex items-center gap-2 rounded-full border border-white/70 bg-white/80 px-4 py-2 shadow-soft">
             <Search size={16} className="text-caramel" />

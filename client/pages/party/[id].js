@@ -261,25 +261,27 @@ export default function PartyProductDetailPage() {
         <div className="grid gap-8 xl:grid-cols-[1.05fr_0.95fr]">
           <div className="space-y-4">
             <div className="relative overflow-hidden rounded-[36px] border border-white/60 bg-white/75 p-3 shadow-soft">
-              <div className="relative h-[360px] overflow-hidden rounded-[28px] bg-[#fff7ef] sm:h-[520px]">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={selectedImage}
-                    initial={{ opacity: 0, scale: 1.02 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.28, ease: "easeOut" }}
-                    className="absolute inset-0"
-                  >
-                    <ProductImage
-                      src={selectedImage || gallery[0] || product.image}
-                      alt={product.name}
-                      fill
-                      priority
-                      className="object-cover"
-                    />
-                  </motion.div>
-                </AnimatePresence>
+              <div className="relative overflow-hidden rounded-[28px] bg-[#fff7ef]">
+                <div className="w-full aspect-[4/3] sm:aspect-[16/9]">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={selectedImage}
+                      initial={{ opacity: 0, scale: 1.02 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.28, ease: "easeOut" }}
+                      className="absolute inset-0"
+                    >
+                      <ProductImage
+                        src={selectedImage || gallery[0] || product.image}
+                        alt={product.name}
+                        fill
+                        priority
+                        className="object-contain"
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
 

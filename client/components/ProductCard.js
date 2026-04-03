@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useShop } from "../context/ShopContext";
 import { formatCurrency } from "../utils/helpers";
 import api from "../utils/api";
+import ProductImage from "./ProductImage";
 
 export default function ProductCard({ product }) {
   const { addToCart } = useShop();
@@ -10,86 +11,34 @@ export default function ProductCard({ product }) {
   const showPartyDetails = ["party", "balloons", "ribbons", "candles", "hats", "banners"].includes(product.category);
 
   return (
-    <motion.div className="rounded-xl border p-4 bg-white">
+    <motion.div className="bg-white rounded-2xl shadow-md p-3 md:rounded-xl md:shadow-none md:p-4">
+      {/* Mobile-first card: image on top */}
+      <div className="w-full overflow-hidden rounded-xl">
+        <div className="relative w-full aspect-[1/1] md:aspect-[4/3]">
+          <ProductImage src={product.image} alt={product.name} fill className="object-contain" />
+        </div>
+      </div>
 
-      {/* IMAGE */}
-      {
-        (() => {
-          const getImageUrl = (img) => {
-            if (!img) return "/placeholder.svg";
-            if (/^https?:\/\//i.test(img)) return img;
-            // remove trailing /api if present in NEXT_PUBLIC_API_URL
-            const configured = (api && api.defaults && api.defaults.baseURL) || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-            const apiRoot = String(configured).replace(/\/api\/?$/, "").replace(/\/$/, "");
-            return `${apiRoot}${img.startsWith("/") ? img : `/${img}`}`;
-          };
+      <h2 className="mt-2 text-base font-semibold text-cocoa md:mt-3">{product.name}</h2>
 
-          const src = getImageUrl(product.image);
-          return (
-            <img
-              src={src}
-              alt={product.name}
-              style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "10px" }}
-              onError={(e) => {
-                e.currentTarget.src = "/placeholder.svg";
-              }}
-            />
-          );
-        })()
-      }
+      <p className="text-orange-500 font-bold mt-1 md:mt-2">{formatCurrency(product.price)}</p>
 
-      {/* TITLE */}
-      <h2 style={{ marginTop: "10px" }}>{product.name}</h2>
-
-      {/* PRICE */}
-      <p>{formatCurrency(product.price)}</p>
-
-      {/* BUTTON SECTION */}
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          marginTop: "10px",
-          alignItems: "center",
-          justifyContent: "space-between"
-        }}
-      >
-
-        {/* VIEW DETAILS */}
-        {showPartyDetails && (
-          <Link href={`/party/${product.id || product._id}`} style={{ textDecoration: "none" }}>
-            <button
-              style={{
-                padding: "8px 14px",
-                backgroundColor: "#f3f4f6",
-                color: "#333",
-                border: "none",
-                borderRadius: "8px",
-                cursor: "pointer"
-              }}
-            >
-              View Details
-            </button>
-          </Link>
-        )}
-
-        {/* ADD TO CART */}
+      <div className="mt-3 md:mt-4">
         <button
           onClick={() => addToCart(product)}
-          style={{
-            padding: "8px 14px",
-            backgroundColor: "#ff7a18",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer"
-          }}
+          className="w-full bg-orange-500 text-white py-2 rounded-xl font-semibold md:inline-block md:w-auto md:px-4"
         >
           Add to Cart
         </button>
-
       </div>
 
+      {showPartyDetails && (
+        <div className="mt-2 md:mt-3">
+          <Link href={`/party/${product.id || product._id}`} className="text-sm text-mocha/70 hover:text-cocoa">
+            View Details
+          </Link>
+        </div>
+      )}
     </motion.div>
   );
 }
