@@ -15,35 +15,16 @@ export default function ProductCard({ product }) {
       {/* IMAGE */}
       {
         (() => {
-          const raw = String(product.image || "").trim();
-          // Consider values like 'http://..', '//..' and also host:port without protocol
-          const hasProtocol = /^https?:\/\//i.test(raw);
-          const hasProtocolRelative = /^\/\//.test(raw);
-          const looksLikeHostPort = /^(localhost|127\.0\.0\.1|[a-z0-9.-]+:\d+)/i.test(raw);
-          const isAbsolute = hasProtocol || hasProtocolRelative || looksLikeHostPort;
+          const getImageUrl = (img) => {
+            if (!img) return "/placeholder.svg";
+            if (/^https?:\/\//i.test(img)) return img;
+            // remove trailing /api if present in NEXT_PUBLIC_API_URL
+            const configured = (api && api.defaults && api.defaults.baseURL) || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+            const apiRoot = String(configured).replace(/\/api\/?$/, "").replace(/\/$/, "");
+            return `${apiRoot}${img.startsWith("/") ? img : `/${img}`}`;
+          };
 
-          // Prefer the configured axios baseURL so deployed sites don't default to localhost.
-          const configuredBase = (api && api.defaults && api.defaults.baseURL) || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-          const apiRoot = String(configuredBase).replace(/\/api\/?$/, "").replace(/\/$/, "");
-
-          let src;
-          if (hasProtocolRelative) {
-            const proto = (typeof window !== "undefined" && window.location && window.location.protocol) ? window.location.protocol : "http:";
-            src = `${proto}${raw}`;
-          } else if (hasProtocol) {
-            const proto = (typeof window !== "undefined" && window.location && window.location.protocol) ? window.location.protocol : "http:";
-            if (/^http:\/\//i.test(raw) && proto === "https:") {
-              src = raw.replace(/^http:\/\//i, "https://");
-            } else {
-              src = raw;
-            }
-          } else if (looksLikeHostPort) {
-            const proto = (typeof window !== "undefined" && window.location && window.location.protocol) ? window.location.protocol : "http:";
-            src = `${proto}//${raw.replace(/^\/+/, "")}`;
-          } else {
-            src = `${apiRoot}/${raw.replace(/^\/+/, "")}`;
-          }
-
+          const src = getImageUrl(product.image);
           return <img src={src} alt={product.name} style={{ width: "100%", height: "200px", objectFit: "cover" }} />;
         })()
       }
