@@ -6,29 +6,29 @@ const nextConfig = {
         protocol: "http",
         hostname: "localhost",
         port: "5000",
-        pathname: "/uploads/**"
+        pathname: "/uploads/**",
       },
       {
         protocol: "http",
         hostname: "127.0.0.1",
         port: "5000",
-        pathname: "/uploads/**"
+        pathname: "/uploads/**",
       },
       {
         protocol: "https",
         hostname: "ram-ji-bakery23.onrender.com",
-        pathname: "/uploads/**"
+        pathname: "/uploads/**",
       },
       {
         protocol: "https",
-        hostname: "images.unsplash.com"
+        hostname: "images.unsplash.com",
       },
       {
         protocol: "https",
-        hostname: "res.cloudinary.com"
-      }
-    ]
-  }
+        hostname: "res.cloudinary.com",
+      },
+    ],
+  },
 };
 
 module.exports = nextConfig;

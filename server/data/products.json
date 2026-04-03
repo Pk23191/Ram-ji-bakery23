@@ -1,5 +1,22 @@
 [
   {
+    "name": "panda  cake",
+    "price": 199,
+    "discountPercent": 0,
+    "category": "cake",
+    "description": "",
+    "colors": [],
+    "image": "http://localhost:5000/uploads/1775201808291-download-2.jpg",
+    "images": [
+      "http://localhost:5000/uploads/1775201808291-download-2.jpg"
+    ],
+    "badge": "Admin Added",
+    "rating": 4.7,
+    "_id": "1775201808297-zvozld",
+    "createdAt": "2026-04-03T07:36:48.297Z",
+    "updatedAt": "2026-04-03T07:36:48.297Z"
+  },
+  {
     "name": "duble side tap",
     "price": 20,
     "discountPercent": 0,

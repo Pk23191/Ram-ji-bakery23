@@ -12,11 +12,18 @@ export default function ProductCard({ product }) {
     <motion.div className="rounded-xl border p-4 bg-white">
 
       {/* IMAGE */}
-      <img
-        src={`http://localhost:5000/${product.image}`}
-        alt={product.name}
-        style={{ width: "100%", height: "200px", objectFit: "cover" }}
-      />
+      {
+        (() => {
+          const raw = String(product.image || "").trim();
+          const isAbsolute = /^https?:\/\//i.test(raw);
+          const apiRoot = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
+          const src = isAbsolute ? raw : `${apiRoot}/${raw.replace(/^\/+/, "")}`;
+
+          return (
+            <img src={src} alt={product.name} style={{ width: "100%", height: "200px", objectFit: "cover" }} />
+          );
+        })()
+      }
 
       {/* TITLE */}
       <h2 style={{ marginTop: "10px" }}>{product.name}</h2>
