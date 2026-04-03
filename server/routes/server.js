@@ -66,6 +66,24 @@ app.use(["/api/settings"], (req, res) => {
 });
 
 app.use((req, res) => {
+  // If this looks like an API or uploads request, return JSON 404.
+  if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
+    return res.status(404).json({ message: "Route not found" });
+  }
+
+  // For browser navigation requests, redirect to the frontend store URL
+  // so client-side routing (Next.js) can handle the route. Use PUBLIC_STORE_URL
+  // or FRONTEND_URL environment variables if provided, otherwise default to
+  // localhost:3000 which is the local Next dev server.
+  const frontendUrl = process.env.PUBLIC_STORE_URL || process.env.FRONTEND_URL || "http://localhost:3000";
+
+  if (req.accepts("html")) {
+    // Preserve the original path so the frontend can handle it.
+    const target = frontendUrl.replace(/\/$/, "") + req.originalUrl;
+    return res.redirect(target);
+  }
+
+  // Fallback to JSON for non-HTML clients.
   res.status(404).json({ message: "Route not found" });
 });
 
