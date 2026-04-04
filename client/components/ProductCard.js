@@ -8,6 +8,11 @@ import ProductImage from "./ProductImage";
 export default function ProductCard({ product }) {
   const { addToCart } = useShop();
 
+  if (process.env.NODE_ENV === "development") {
+    // eslint-disable-next-line no-console
+    console.log("Product Image:", product?.image);
+  }
+
   const showPartyDetails = ["party", "balloons", "ribbons", "candles", "hats", "banners"].includes(product.category);
 
   return (

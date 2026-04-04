@@ -292,6 +292,9 @@ async function createProduct(req, res) {
       category: req.body?.category,
       price: req.body?.price
     });
+    // Debug: log uploaded files to help diagnose missing-image issues
+    console.log("FILES:", Array.isArray(req.files) ? req.files.map(f => ({fieldname: f.fieldname, originalname: f.originalname, size: f.size})) : req.files);
+    console.log("FILE:", req.file);
     const uploadedImages = await uploadFilesToCloudinary(req, req.files || []);
     const payload = normalizeProductPayload(req.body, {
       uploadedImages

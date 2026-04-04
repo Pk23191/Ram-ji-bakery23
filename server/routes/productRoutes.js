@@ -10,7 +10,8 @@ const {
 } = require("../controllers/productController");
 
 const router = express.Router();
-const uploadProductImages = memoryUpload.array("images", 4);
+// Accept any file fields so frontend can send either `image` or `images`.
+const uploadProductImages = memoryUpload.any();
 
 function runProductUpload(req, res, next) {
   uploadProductImages(req, res, (error) => {

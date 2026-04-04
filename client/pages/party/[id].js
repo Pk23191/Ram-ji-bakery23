@@ -25,6 +25,9 @@ export default function PartyProductDetailPage() {
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState("");
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [isZoomed, setIsZoomed] = useState(false);
   const [selectedColor, setSelectedColor] = useState("");
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
@@ -261,8 +264,8 @@ export default function PartyProductDetailPage() {
         <div className="grid gap-8 xl:grid-cols-[1.05fr_0.95fr]">
           <div className="space-y-4">
             <div className="relative overflow-hidden rounded-[36px] border border-white/60 bg-white/75 p-3 shadow-soft">
-              <div className="relative overflow-hidden rounded-[28px] bg-[#fff7ef]">
-                <div className="w-full aspect-[4/3] sm:aspect-[16/9]">
+                <div className="relative overflow-hidden rounded-[28px] bg-[#fff7ef]">
+                <div className="relative w-full aspect-[4/3] sm:aspect-[16/9]">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={selectedImage}
@@ -272,13 +275,24 @@ export default function PartyProductDetailPage() {
                       transition={{ duration: 0.28, ease: "easeOut" }}
                       className="absolute inset-0"
                     >
-                      <ProductImage
-                        src={selectedImage || gallery[0] || product.image}
-                        alt={product.name}
-                        fill
-                        priority
-                        className="object-contain"
-                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const idx = gallery.findIndex((g) => g === (selectedImage || gallery[0] || product.image));
+                          setGalleryIndex(idx >= 0 ? idx : 0);
+                          setIsGalleryOpen(true);
+                        }}
+                        className="absolute inset-0"
+                        aria-label="Open image gallery"
+                      >
+                        <ProductImage
+                          src={selectedImage || gallery[0] || product.image}
+                          alt={product.name}
+                          fill
+                          priority
+                          className="object-contain"
+                        />
+                      </button>
                     </motion.div>
                   </AnimatePresence>
                 </div>
@@ -286,7 +300,7 @@ export default function PartyProductDetailPage() {
             </div>
 
             <div className="grid grid-cols-4 gap-3">
-              {gallery.map((image, index) => (
+                {gallery.map((image, index) => (
                 <button
                   key={`${image}-${index}`}
                   type="button"
@@ -296,7 +310,7 @@ export default function PartyProductDetailPage() {
                   }`}
                 >
                   <div className="relative h-full w-full overflow-hidden rounded-[18px]">
-                    <ProductImage src={image} alt={`${product.name} view ${index + 1}`} fill className="object-cover" />
+                    <ProductImage src={image} alt={`${product.name} view ${index + 1}`} fill className="object-contain" />
                   </div>
                 </button>
               ))}
@@ -363,7 +377,7 @@ export default function PartyProductDetailPage() {
                     }`}
                   >
                     <span className="h-9 w-9 overflow-hidden rounded-full border border-white/70">
-                      <ProductImage src={color.image} alt={color.name} width={36} height={36} className="h-full w-full object-cover" />
+                      <ProductImage src={color.image} alt={color.name} width={36} height={36} className="h-full w-full object-contain" />
                     </span>
                     {color.name}
                     {selectedColor === color.name ? <Check size={16} /> : null}
@@ -386,6 +400,69 @@ export default function PartyProductDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Gallery modal */}
+        <AnimatePresence>
+          {isGalleryOpen ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+            >
+              <div className="relative w-full max-w-4xl h-[80vh]">
+                <motion.button
+                  onClick={() => setIsZoomed((z) => !z)}
+                  className="absolute right-4 top-4 z-60 rounded-full bg-white/90 p-2 text-sm"
+                >
+                  {isZoomed ? "Exit Zoom" : "Zoom"}
+                </motion.button>
+
+                <button
+                  onClick={() => {
+                    setIsGalleryOpen(false);
+                    setIsZoomed(false);
+                  }}
+                  className="absolute right-4 top-16 z-60 rounded-full bg-white/90 p-2 text-sm"
+                >
+                  Close
+                </button>
+
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative w-full h-full overflow-hidden rounded-lg">
+                    <motion.div
+                      key={gallery[galleryIndex]}
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: isZoomed ? 1.4 : 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.28 }}
+                      className="w-full h-full"
+                      style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+                    >
+                      <ProductImage src={gallery[galleryIndex]} alt={product.name} fill className="object-contain" />
+                    </motion.div>
+                  </div>
+                </div>
+
+                <div className="absolute bottom-4 left-1/2 z-60 w-full max-w-3xl -translate-x-1/2">
+                  <div className="mx-auto flex gap-3 overflow-auto px-4">
+                    {gallery.map((img, i) => (
+                      <button
+                        key={img}
+                        onClick={() => setGalleryIndex(i)}
+                        className={`h-16 w-20 flex-shrink-0 overflow-hidden rounded-md border ${i === galleryIndex ? "border-caramel" : "border-white/60"}`}
+                      >
+                        <div className="relative h-full w-full">
+                          <ProductImage src={img} alt={`thumb-${i}`} fill className="object-contain" />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
 
         <div className="mt-10 grid gap-8 xl:grid-cols-[0.92fr_1.08fr]">
           <div className="glass-panel p-6 sm:p-8">

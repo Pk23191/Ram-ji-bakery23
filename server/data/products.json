@@ -1,5 +1,39 @@
 [
   {
+    "name": "hat",
+    "price": 18,
+    "discountPercent": 0,
+    "category": "hats",
+    "description": "",
+    "colors": [],
+    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775242900/ramji-bakery/products/product-1775242896845-1.jpg",
+    "images": [
+      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775242900/ramji-bakery/products/product-1775242896845-1.jpg"
+    ],
+    "badge": "Admin Added",
+    "rating": 4.7,
+    "_id": "1775242901764-c8vphp",
+    "createdAt": "2026-04-03T19:01:41.764Z",
+    "updatedAt": "2026-04-03T19:01:41.764Z"
+  },
+  {
+    "name": "party poppy",
+    "price": 120,
+    "discountPercent": 0,
+    "category": "party",
+    "description": "",
+    "colors": [],
+    "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775241792/ramji-bakery/products/product-1775241789674-1.jpg",
+    "images": [
+      "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775241792/ramji-bakery/products/product-1775241789674-1.jpg"
+    ],
+    "badge": "Admin Added",
+    "rating": 4.7,
+    "_id": "1775241793619-h8ynzu",
+    "createdAt": "2026-04-03T18:43:13.619Z",
+    "updatedAt": "2026-04-03T18:43:13.619Z"
+  },
+  {
     "name": "panda  cake",
     "price": 199,
     "discountPercent": 0,
@@ -359,7 +393,7 @@
   {
     "name": "BALLON1",
     "price": 198,
-    "category": "party",
+    "category": "balloons",
     "description": "",
     "colors": [],
     "image": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207152/ramji-bakery/products/migrate-1775048474896-19-1775207152569.jpg",
@@ -370,6 +404,8 @@
     "rating": 4.7,
     "_id": "1775048474909-aw5eah",
     "createdAt": "2026-04-01T13:01:14.909Z",
-    "updatedAt": "2026-04-01T13:01:14.909Z"
+    "updatedAt": "2026-04-03T18:34:45.033Z",
+    "discountPercent": 0,
+    "existingImages": "https://res.cloudinary.com/dxjhtsb2s/image/upload/v1775207152/ramji-bakery/products/migrate-1775048474896-19-1775207152569.jpg"
   }
 ]
