@@ -1,7 +1,7 @@
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, ".env") });
+require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 require("express-async-errors");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
@@ -16,6 +16,7 @@ const fileReviewRoutes = require("./fileReviewRoutes");
 const fileDashboardRoutes = require("./fileDashboardRoutes");
 const fileUserRoutes = require("./fileUserRoutes");
 const fileCouponRoutes = require("./fileCouponRoutes");
+const { getCloudinaryConfigError } = require("../config/cloudinary");
 const uploadRoutes = require("./upload");
 const uploadLegacyRoutes = require("./uploadRoutes");
 const bannerRoutes = require("./bannerRoutes");
@@ -27,10 +28,28 @@ let server;
 app.set("trust proxy", 1);
 
 // Core middleware for API requests and media uploads.
+const allowedOrigins = [
+  "https://ram-ji-bakery23.vercel.app",
+  "https://ram-ji-bakery.vercel.app",
+  process.env.FRONTEND_URL,
+  process.env.PUBLIC_STORE_URL
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: true,
-    credentials: true
+    origin(origin, cb) {
+      // Allow requests with no origin (mobile apps, Postman, server-to-server)
+      if (!origin) return cb(null, true);
+      // Allow any localhost for development
+      if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
+      if (allowedOrigins.includes(origin)) return cb(null, true);
+      // Allow any *.vercel.app preview deploys
+      if (/\.vercel\.app$/.test(origin)) return cb(null, true);
+      return cb(null, true); // fallback: allow all for now
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 app.use(express.json({ limit: "10mb" }));
@@ -159,6 +178,14 @@ function registerShutdownHandlers() {
 
 async function startServer() {
   await ensureDefaultAdmin();
+
+  const cloudinaryError = getCloudinaryConfigError();
+  if (cloudinaryError) {
+    console.warn("⚠️  WARNING:", cloudinaryError, "Product image uploads will fail until this is fixed.");
+  } else {
+    console.log("Cloudinary configured successfully.");
+  }
+
   server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
   server.on("error", (error) => {

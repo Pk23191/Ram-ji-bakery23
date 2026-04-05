@@ -292,10 +292,21 @@ async function createProduct(req, res) {
       category: req.body?.category,
       price: req.body?.price
     });
-    // Debug: log uploaded files to help diagnose missing-image issues
     console.log("FILES:", Array.isArray(req.files) ? req.files.map(f => ({fieldname: f.fieldname, originalname: f.originalname, size: f.size})) : req.files);
     console.log("FILE:", req.file);
-    const uploadedImages = await uploadFilesToCloudinary(req, req.files || []);
+
+    const files = req.files || (req.file ? [req.file] : []);
+
+    let uploadedImages = [];
+    if (files.length) {
+      const configError = getCloudinaryConfigError();
+      if (configError) {
+        console.error("Cloudinary config error:", configError);
+        return res.status(500).json({ message: configError });
+      }
+      uploadedImages = await uploadFilesToCloudinary(req, files);
+    }
+
     const payload = normalizeProductPayload(req.body, {
       uploadedImages
     });
@@ -318,7 +329,8 @@ async function createProduct(req, res) {
     return res.status(201).json(product);
   } catch (error) {
     console.error("Create product failed:", error);
-    return res.status(500).json({ message: "Unable to save product" });
+    const msg = error.message || "Unable to save product";
+    return res.status(500).json({ message: msg });
   }
 }
 
@@ -333,7 +345,18 @@ async function updateProduct(req, res) {
     }
 
     const currentImages = parseMultiValue(req.body.existingImages);
-    const uploadedImages = await uploadFilesToCloudinary(req, req.files || []);
+
+    const files = req.files || (req.file ? [req.file] : []);
+    let uploadedImages = [];
+    if (files.length) {
+      const configError = getCloudinaryConfigError();
+      if (configError) {
+        console.error("Cloudinary config error:", configError);
+        return res.status(500).json({ message: configError });
+      }
+      uploadedImages = await uploadFilesToCloudinary(req, files);
+    }
+
     const payload = normalizeProductPayload(
       {
         ...(currentProduct.toObject ? currentProduct.toObject() : currentProduct),
@@ -361,7 +384,8 @@ async function updateProduct(req, res) {
     return res.json(updatedProduct);
   } catch (error) {
     console.error("Update product failed:", error);
-    return res.status(500).json({ message: "Unable to update product" });
+    const msg = error.message || "Unable to update product";
+    return res.status(500).json({ message: msg });
   }
 }
 
