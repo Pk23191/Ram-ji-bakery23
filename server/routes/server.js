@@ -186,6 +186,22 @@ async function startServer() {
     console.log("Cloudinary configured successfully.");
   }
 
+  // --- Startup env diagnostics (helps debug missing vars on Render) ---
+  const envStatus = (key) => {
+    const val = process.env[key];
+    if (!val) return "❌ NOT SET";
+    return `✅ set (${val.length} chars)`;
+  };
+  console.log("--- ENV DIAGNOSTICS ---");
+  console.log("CLOUDINARY_CLOUD_NAME:", envStatus("CLOUDINARY_CLOUD_NAME"));
+  console.log("CLOUDINARY_API_KEY:", envStatus("CLOUDINARY_API_KEY"));
+  console.log("CLOUDINARY_API_SECRET:", envStatus("CLOUDINARY_API_SECRET"));
+  console.log("JWT_SECRET:", envStatus("JWT_SECRET"));
+  console.log("FRONTEND_URL:", envStatus("FRONTEND_URL"));
+  console.log("MONGO_URI:", envStatus("MONGO_URI"));
+  console.log("PORT:", process.env.PORT || "5000 (default)");
+  console.log("--- END DIAGNOSTICS ---");
+
   server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
   server.on("error", (error) => {

@@ -10,7 +10,7 @@ const {
 } = require("../controllers/authController");
 
 const router = express.Router();
-const googleFailureRedirect = `${process.env.PUBLIC_STORE_URL || "http://localhost:3000"}/login?google=failed`;
+const googleFailureRedirect = `${process.env.PUBLIC_STORE_URL || process.env.FRONTEND_URL || "https://ram-ji-bakery23.vercel.app"}/login?google=failed`;
 const googleConfigured = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 
 function requireGoogleAuth(req, res, next) {
