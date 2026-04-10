@@ -2,31 +2,25 @@ import axios from "axios";
 
 // Determine API base URL based on environment
 const getBaseURL = () => {
-  // For production (deployed on Vercel)
-  if (typeof window !== "undefined" && window.location.hostname.includes("vercel.app")) {
-    return "/api"; // Use relative path (same domain)
-  }
-  
-  // Explicit environment variable (set in Vercel project settings)
+  // Prefer explicit environment variable when provided (works for Vercel -> Render setup)
   if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/+$/, "");
   }
-  
+
   // Fallback for local development
   if (typeof window !== "undefined") {
     return "http://localhost:5000/api";
   }
-  
-  // Fallback for SSR
-  return "/api";
+
+  // Fallback for SSR — should not reach here in production if env var is set
+  return "http://localhost:5000/api";
 };
 
 const baseURL = getBaseURL().replace(/\/+$/, "");
 
 const api = axios.create({
   baseURL,
-  timeout: 30000,
-  withCredentials: true
+  timeout: 30000
 });
 
 // Helper used by admin UI to set global auth header for admin requests.

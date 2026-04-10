@@ -43,20 +43,27 @@ app.use(
     origin(origin, cb) {
       // Allow requests with no origin (mobile apps, Postman, server-to-server)
       if (!origin) return cb(null, true);
+
       // Allow any localhost for development
       if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
+
+      // Explicit allow-list (use FRONTEND_URL / PUBLIC_STORE_URL env vars)
       if (allowedOrigins.includes(origin)) return cb(null, true);
-      // Allow any *.vercel.app preview deploys
+
+      // Allow Vercel preview domains
       if (/\.vercel\.app$/.test(origin)) return cb(null, true);
-      return cb(null, true); // fallback: allow all for now
+
+      // Otherwise reject CORS (safer in production)
+      return cb(new Error("CORS not allowed for origin: " + origin), false);
     },
-    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Authorization"],
+    optionsSuccessStatus: 200
   })
 );
 app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // Serve uploaded static files from the project root `uploads/` directory.
 // Using process.cwd() makes the path consistent when running from different working dirs.
 app.use(
@@ -97,32 +104,31 @@ app.use(["/api/settings"], (req, res) => {
   res.status(501).json({ message: "MongoDB has been removed from this project. These endpoints are disabled." });
 });
 
+// 404 handler for non-matching routes
 app.use((req, res) => {
   // If this looks like an API or uploads request, return JSON 404.
   if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
-    return res.status(404).json({ message: "Route not found" });
+    return res.status(404).json({ ok: false, message: "Route not found" });
   }
 
-  // For browser navigation requests, redirect to the frontend store URL
-  // so client-side routing (Next.js) can handle the route. Use PUBLIC_STORE_URL
-  // or FRONTEND_URL environment variables if provided, otherwise default to
-  // localhost:3000 which is the local Next dev server.
+  // For browser navigation requests, redirect to the frontend store URL so Next.js can handle client routing.
   const frontendUrl = process.env.PUBLIC_STORE_URL || process.env.FRONTEND_URL || "https://ram-ji-bakery.vercel.app";
 
   if (req.accepts("html")) {
-    // Preserve the original path so the frontend can handle it.
     const target = frontendUrl.replace(/\/$/, "") + req.originalUrl;
     return res.redirect(target);
   }
 
   // Fallback to JSON for non-HTML clients.
-  res.status(404).json({ message: "Route not found" });
+  res.status(404).json({ ok: false, message: "Route not found" });
 });
 
 // Unified error handler for cleaner production responses.
 app.use((error, req, res, next) => {
-  console.error(error);
-  res.status(500).json({ message: error.message || "Server error" });
+  const status = error?.statusCode || error?.status || 500;
+  const message = error?.message || "Server error";
+  console.error("ERROR_HANDLER:", { status, message, stack: error?.stack });
+  res.status(status).json({ ok: false, message });
 });
 
 const PORT = process.env.PORT || 5000;
@@ -183,6 +189,16 @@ function registerShutdownHandlers() {
 }
 
 async function startServer() {
+  // Fail fast if JWT_SECRET is missing in production
+  if (!process.env.JWT_SECRET) {
+    if (process.env.NODE_ENV === "production") {
+      console.error("❌ FATAL: JWT_SECRET is not set. Authentication will fail for all users.");
+      console.error("   Set JWT_SECRET in your Render environment variables.");
+    } else {
+      console.warn("⚠️  JWT_SECRET is not set — using dev fallback. Never do this in production!");
+    }
+  }
+
   await ensureDefaultAdmin();
 
   try {

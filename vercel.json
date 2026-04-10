@@ -8,42 +8,9 @@
       "config": {
         "maxLambdaSize": "50mb"
       }
-    },
-    {
-      "src": "server/server.js",
-      "use": "@vercel/node@latest"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api(.*)",
-      "dest": "server/server.js",
-      "continue": true
-    },
-    {
-      "src": "/uploads(.*)",
-      "dest": "server/server.js"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "client/.next/server/pages/$1",
-      "continue": true
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
     }
   ],
   "env": {
-    "NEXT_PUBLIC_API_URL": "@next_public_api_url",
-    "MONGO_URI": "@mongo_uri",
-    "CLOUDINARY_CLOUD_NAME": "@cloudinary_cloud_name",
-    "CLOUDINARY_API_KEY": "@cloudinary_api_key",
-    "CLOUDINARY_API_SECRET": "@cloudinary_api_secret",
-    "ADMIN_EMAIL": "@admin_email",
-    "ADMIN_PASSWORD": "@admin_password"
+    "NEXT_PUBLIC_API_URL": "@next_public_api_url"
   }
 }
