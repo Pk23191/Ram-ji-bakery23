@@ -95,12 +95,15 @@ async function getOrders(req, res) {
     const isAdmin = ["admin", "superadmin"].includes(req.user?.role || "");
     const email = isAdmin ? req.query.email || "" : req.user?.email || req.query.email || "";
     const phone = isAdmin ? req.query.phone || "" : req.user?.phone || req.query.phone || "";
+    const orderId = String(req.query.orderId || req.query.id || "").trim();
 
-    const filtered = email
-      ? orders.filter((order) => order.customerEmail === email)
-      : phone
-        ? orders.filter((order) => order.phone === phone)
-        : orders;
+    const filtered = orderId
+      ? orders.filter((order) => order.orderId === orderId || order.id === orderId)
+      : email
+        ? orders.filter((order) => order.customerEmail === email)
+        : phone
+          ? orders.filter((order) => order.phone === phone)
+          : orders;
 
     return res.json(filtered);
   } catch (error) {

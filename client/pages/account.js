@@ -16,7 +16,7 @@ export default function AccountPage() {
   const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
-    if (!customerSession?.token || !customerSession?.email) {
+    if (!customerSession?.token) {
       router.replace("/login");
       return;
     }
@@ -31,17 +31,37 @@ export default function AccountPage() {
             Authorization: `Bearer ${customerSession.token}`
           }
         };
-        const [{ data: profileData }, { data: orderData }] = await Promise.all([
-          api.get("/auth/me", headers),
+
+        const orderParams = {
+          ...(customerSession.email ? { email: customerSession.email } : {}),
+          ...(customerSession.phone ? { phone: customerSession.phone } : {})
+        };
+
+        const requests = [];
+        if (customerSession.email) {
+          requests.push(api.get("/auth/me", headers));
+        }
+        requests.push(
           api.get("/orders", {
-            params: { email: customerSession.email },
+            params: orderParams,
             ...headers
           })
-        ]);
+        );
 
+        const results = await Promise.all(requests);
         if (!active) return;
-        setProfile(profileData.user);
-        setOrders(Array.isArray(orderData) ? orderData : []);
+
+        if (customerSession.email) {
+          setProfile(results[0]?.data?.user || null);
+          setOrders(Array.isArray(results[1]?.data) ? results[1].data : []);
+        } else {
+          setProfile({
+            name: customerSession.name,
+            email: "",
+            role: "customer"
+          });
+          setOrders(Array.isArray(results[0]?.data) ? results[0].data : []);
+        }
       } catch (error) {
         toast.error(error.response?.data?.message || "Unable to load your account");
       } finally {
@@ -56,7 +76,7 @@ export default function AccountPage() {
     return () => {
       active = false;
     };
-  }, [customerSession?.token, customerSession?.email, router]);
+  }, [customerSession?.token, customerSession?.email, customerSession?.phone, router]);
 
   return (
     <>
