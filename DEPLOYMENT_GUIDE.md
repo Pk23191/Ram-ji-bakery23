@@ -68,18 +68,26 @@ cd server && npm run dev:watch
 1. **Create Vercel account**: https://vercel.com
 
 2. **Import your GitHub project**:
-   - Select your repository
-   - Framework preset: Next.js
-   - Root directory: `client`
+   - Go to https://vercel.com/new → **Import Git Repository**
+   - Select `Pk23191/Ram-ji-bakery23`
+   - **Root Directory**: leave as **default** (repo root — do NOT change to `client`)
+   - Vercel will automatically read `vercel.json` which points to `client/`
+   - Framework Preset will be auto-detected as **Next.js**
 
-3. **Set Environment Variables** in Vercel dashboard:
+3. **Set Environment Variables** in Vercel dashboard (Settings → Environment Variables):
    ```
    NEXT_PUBLIC_API_URL=https://your-render-backend-url.onrender.com/api
    ```
-   
-   Or leave blank to auto-detect (same domain when deployed)
+   Replace the URL with your actual Render backend URL.
+   This variable is optional — if omitted, the app falls back to `http://localhost:5000/api`
+   (which only works in local development).
 
-4. **Deploy**: Vercel auto-deploys on git push
+4. **Deploy**: Click **Deploy** — Vercel will build and deploy automatically.
+   - Future pushes to `main` trigger automatic redeployments.
+
+> **Why not set Root Directory to `client`?** The `vercel.json` at the repo root already
+> tells Vercel to build the Next.js app from `client/` using the `@vercel/next` builder.
+> Setting Root Directory to `client` would make Vercel ignore this config and may break routing.
 
 ---
 
