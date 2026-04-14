@@ -69,13 +69,13 @@ export default function ClockPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // Render a placeholder until the clock is initialised (avoids SSR mismatch)
+  // Render a placeholder until the clock is initialized (avoids SSR mismatch)
   if (!now) {
     return (
       <>
         <Seo title="World Clock" description="Live digital clock showing current time in multiple time zones." path="/clock" />
         <div className="min-h-screen bg-cocoa flex items-center justify-center">
-          <p className="text-latte text-lg animate-pulse">Initialising clock…</p>
+          <p className="text-latte text-lg animate-pulse">Initializing clock…</p>
         </div>
       </>
     );
