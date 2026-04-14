@@ -1,0 +1,21 @@
+[
+  {
+    "orderId": "RB000001",
+    "customer": "Demo User",
+    "customerEmail": "demo@example.com",
+    "phone": "9000000000",
+    "address": "Main Market Road, Dinara, MP",
+    "paymentMethod": "COD",
+    "status": "Pending",
+    "total": 500,
+    "items": [
+      {
+        "name": "Chocolate Cake",
+        "quantity": 1,
+        "price": 500,
+        "image": "https://example.com/cake.jpg"
+      }
+    ],
+    "orderTime": "2026-04-14T10:00:00.000Z"
+  }
+]

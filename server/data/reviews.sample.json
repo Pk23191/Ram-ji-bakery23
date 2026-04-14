@@ -1,0 +1,10 @@
+[
+  {
+    "id": "review-001",
+    "userId": "demo-user-001",
+    "productId": "demo-product-001",
+    "rating": 5,
+    "comment": "Fresh and delicious cake!",
+    "createdAt": "2026-04-14T10:00:00.000Z"
+  }
+]

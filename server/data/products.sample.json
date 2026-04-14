@@ -1,0 +1,11 @@
+[
+  {
+    "_id": "demo-product-001",
+    "name": "Signature Truffle Cake",
+    "price": 699,
+    "category": "cake",
+    "description": "Rich chocolate sponge layered with creamy ganache.",
+    "images": ["https://example.com/truffle-cake.jpg"],
+    "createdAt": "2026-04-14T10:00:00.000Z"
+  }
+]

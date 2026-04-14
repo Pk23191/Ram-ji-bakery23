@@ -4,6 +4,10 @@ dist
 coverage
 .env
 .env.local
+uploads/
+server/data/*.json
+!server/data/*.sample.json
+server/data/*.bak.*
 client/.next
 server/uploads/*
 !server/uploads/.gitkeep

@@ -1,0 +1,11 @@
+[
+  {
+    "id": "demo-user-001",
+    "name": "Demo User",
+    "email": "demo@example.com",
+    "password": "$2a$10$demoHashedPasswordValue",
+    "role": "customer",
+    "emailVerified": false,
+    "createdAt": "2026-04-14T10:00:00.000Z"
+  }
+]
