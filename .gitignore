@@ -11,3 +11,6 @@ server/data/*.bak.*
 client/.next
 server/uploads/*
 !server/uploads/.gitkeep
+.idea/
+*.log
+tmp-*

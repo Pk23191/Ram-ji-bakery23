@@ -63,7 +63,7 @@ export default function ProductImage({ src, alt, fill, width, height, className,
           loading={priority ? 'eager' : loading}
           style={style}
           onError={handleError}
-          onLoadingComplete={handleLoadingComplete}
+          onLoad={handleLoadingComplete}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           quality={75}
           {...rest}
@@ -93,7 +93,7 @@ export default function ProductImage({ src, alt, fill, width, height, className,
         priority={priority}
         loading={priority ? 'eager' : loading}
         onError={handleError}
-        onLoadingComplete={handleLoadingComplete}
+        onLoad={handleLoadingComplete}
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         quality={75}
         {...rest}

@@ -11,8 +11,8 @@ function sanitizeString(str) {
     .replace(/javascript:/gi, '') // Remove javascript: protocol
     .replace(/on\w+\s*=/gi, ''); // Remove event handlers like onclick=
   
-  // Trim and limit length
-  return sanitized.trim().substring(0, 500);
+  // Trim and limit length — 2000 chars to accommodate product descriptions
+  return sanitized.trim().substring(0, 2000);
 }
 
 // Validate email format
