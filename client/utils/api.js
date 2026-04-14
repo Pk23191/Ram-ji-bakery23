@@ -37,11 +37,13 @@ api.interceptors.request.use(
   (config) => {
     try {
       if (!config.headers) config.headers = {};
-      if (!config.headers.Authorization) {
-        const raw = window.localStorage.getItem("ramji-customer-session");
-        const session = raw ? JSON.parse(raw) : null;
-        if (session?.token) {
-          config.headers.Authorization = `Bearer ${session.token}`;
+      if (typeof window !== 'undefined') {
+        if (!config.headers.Authorization) {
+          const raw = window.localStorage.getItem("ramji-customer-session");
+          const session = raw ? JSON.parse(raw) : null;
+          if (session?.token) {
+            config.headers.Authorization = `Bearer ${session.token}`;
+          }
         }
       }
     } catch (e) {
@@ -73,12 +75,16 @@ api.interceptors.response.use(
           // no-op
         } else if (isAdminRoute) {
           isRedirecting = true;
+          // Reset after 3 seconds so a failed/blocked redirect doesn't permanently suppress future 401 handling
+          setTimeout(() => { isRedirecting = false; }, 3000);
           window.localStorage.removeItem("ramji-admin-token");
           window.localStorage.removeItem("ramji-admin-user");
           setAdminAuthToken("");
           window.location.href = "/admin/login";
         } else if (isCustomerAuthRoute) {
           isRedirecting = true;
+          // Reset after 3 seconds so a failed/blocked redirect doesn't permanently suppress future 401 handling
+          setTimeout(() => { isRedirecting = false; }, 3000);
           window.localStorage.removeItem("ramji-customer-session");
           window.location.href = "/login";
         }

@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useShop } from "../context/ShopContext";
 import { formatCurrency } from "../utils/helpers";
-import api from "../utils/api";
 import ProductImage from "./ProductImage";
 import { Star } from "lucide-react";
 
