@@ -9,10 +9,12 @@ const getBaseURL = () => {
 
   // Fallback for local development
   if (typeof window !== "undefined") {
+    if (window.location.hostname.includes("vercel.app")) {
+      return "/api"; // Vercel proxy
+    }
     return "http://localhost:5000/api";
   }
 
-  // Fallback for SSR — should not reach here in production if env var is set
   return "http://localhost:5000/api";
 };
 

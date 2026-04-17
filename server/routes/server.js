@@ -141,6 +141,9 @@ app.use(["/api/settings"], (req, res) => {
 
 // 404 handler for non-matching routes
 app.use((req, res) => {
+  // Enhanced logging to identify mismatched routes
+  console.log(`404 NOT FOUND: ${req.method} ${req.path}`);
+  
   // If this looks like an API or uploads request, return JSON 404.
   if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
     return res.status(404).json({ ok: false, message: "Route not found" });
@@ -150,8 +153,13 @@ app.use((req, res) => {
   const frontendUrl = process.env.PUBLIC_STORE_URL || process.env.FRONTEND_URL || "https://ram-ji-bakery.vercel.app";
 
   if (req.accepts("html")) {
-    const target = frontendUrl.replace(/\/$/, "") + req.originalUrl;
-    return res.redirect(target);
+    const isLocal = req.hostname === "localhost" || req.hostname === "127.0.0.1";
+    if (isLocal) {
+      // Don't redirect on localhost so we can see the backend status page/routes if needed.
+    } else {
+      const target = frontendUrl.replace(/\/$/, "") + req.originalUrl;
+      return res.redirect(target);
+    }
   }
 
   // Fallback to JSON for non-HTML clients.
@@ -167,7 +175,7 @@ app.use((error, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-const ADMINS_FILE = path.join(__dirname, "data", "admins.json");
+const ADMINS_FILE = path.join(__dirname, "..", "data", "admins.json");
 
 async function ensureDefaultAdmin() {
   try {

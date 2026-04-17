@@ -12,13 +12,24 @@ export default function ProductImage({ src, alt, fill, width, height, className,
 
   const normalize = (s) => {
     if (!s) return null;
-    const str = String(s).trim();
+    let str = String(s).trim().replace(/\\/g, "/"); // Fix Windows paths
     if (!str) return null;
     if (str.startsWith("data:image/")) return str;
+    
+    // Don't force HTTPS for localhost as it breaks local dev
+    if (str.includes("localhost")) return str;
+
     // Ensure HTTPS for security
     if (str.startsWith("//")) return "https:" + str;
     if (str.startsWith("http:")) return str.replace(/^http:/, "https:");
-    if (!str.startsWith("http")) return str;
+
+    // If it's a relative path from backend
+    if (!str.startsWith("http") && !str.startsWith("data:")) {
+      const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+      const origin = apiURL.replace(/\/api\/?$/, "");
+      const cleanPath = str.startsWith("/") ? str : `/${str}`;
+      return `${origin}${cleanPath}`;
+    }
     return str;
   };
 
@@ -41,7 +52,7 @@ export default function ProductImage({ src, alt, fill, width, height, className,
     setFallback("/images/cake1.jpg");
   };
 
-  const handleLoadingComplete = () => {
+  const handleLoad = () => {
     setIsLoading(false);
   };
 
@@ -63,7 +74,7 @@ export default function ProductImage({ src, alt, fill, width, height, className,
           loading={priority ? 'eager' : loading}
           style={style}
           onError={handleError}
-          onLoadingComplete={handleLoadingComplete}
+          onLoad={handleLoad}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           quality={75}
           {...rest}
@@ -93,7 +104,7 @@ export default function ProductImage({ src, alt, fill, width, height, className,
         priority={priority}
         loading={priority ? 'eager' : loading}
         onError={handleError}
-        onLoadingComplete={handleLoadingComplete}
+        onLoad={handleLoad}
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         quality={75}
         {...rest}
