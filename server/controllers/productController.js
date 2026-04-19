@@ -3,6 +3,7 @@ const { readJson, writeJson } = require("../utils/fileStore");
 const { uploadImageBuffer, getCloudinaryConfigError } = require("../config/cloudinary");
 
 const PRODUCTS_FILE = path.join(__dirname, "..", "data", "products.json");
+const SAMPLE_PRODUCTS_FILE = path.join(__dirname, "..", "data", "products.sample.json");
 // Increase cache TTL for product list to reduce file I/O and URL-fixing work
 const CACHE_TTL_MS = 5 * 60 * 1000;
 let cachedProducts = null;
@@ -106,6 +107,26 @@ function parseMultiValue(value) {
   return [];
 }
 
+async function readProductsWithFallback() {
+  const products = await readJson(PRODUCTS_FILE, []);
+  if (Array.isArray(products) && products.length) {
+    return products;
+  }
+
+  const sampleProducts = await readJson(SAMPLE_PRODUCTS_FILE, []);
+  if (Array.isArray(sampleProducts) && sampleProducts.length) {
+    try {
+      await writeJson(PRODUCTS_FILE, sampleProducts);
+    } catch (error) {
+      console.error("Unable to seed products file from sample data:", error);
+    }
+
+    return sampleProducts;
+  }
+
+  return [];
+}
+
 async function uploadFilesToCloudinary(req, files = []) {
   try {
     const configError = getCloudinaryConfigError();
@@ -195,7 +216,7 @@ async function getProducts(req, res) {
       }
 
       // Read raw products and compute fixedProducts once, then cache the fixed list.
-      const rawProducts = await readJson(PRODUCTS_FILE, []);
+      const rawProducts = await readProductsWithFallback();
       // Fix stored image URLs that point to localhost so deployed site shows images.
       const apiRoot = (process.env.PUBLIC_API_URL || `${req.protocol}://${req.get("host")}/api`).replace(/\/api\/?$/, "").replace(/\/$/, "");
       const fixedProducts = rawProducts.map((product) => {
@@ -267,7 +288,7 @@ async function getProducts(req, res) {
 
 async function getProductById(req, res) {
   try {
-    const products = await readJson(PRODUCTS_FILE, []);
+    const products = await readProductsWithFallback();
     const product = products.find((item) => String(item._id) === String(req.params.id));
 
     if (!product) {
@@ -343,7 +364,7 @@ async function createProduct(req, res) {
       return res.status(400).json({ message: "Please add at least one product image." });
     }
 
-    const products = await readJson(PRODUCTS_FILE, []);
+    const products = await readProductsWithFallback();
     const product = {
       ...payload,
       _id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -364,7 +385,7 @@ async function createProduct(req, res) {
 
 async function updateProduct(req, res) {
   try {
-    const products = await readJson(PRODUCTS_FILE, []);
+    const products = await readProductsWithFallback();
     const index = products.findIndex((item) => String(item._id) === String(req.params.id));
     const currentProduct = index >= 0 ? products[index] : null;
 
@@ -419,7 +440,7 @@ async function updateProduct(req, res) {
 
 async function deleteProduct(req, res) {
   try {
-    const products = await readJson(PRODUCTS_FILE, []);
+    const products = await readProductsWithFallback();
     const index = products.findIndex((item) => String(item._id) === String(req.params.id));
     const product = index >= 0 ? products[index] : null;
 

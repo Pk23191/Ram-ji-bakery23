@@ -5,7 +5,7 @@ const nextConfig = {
       // Development: localhost HTTP
       { protocol: "http", hostname: "localhost", pathname: "/**" },
       // Production backend on Render
-      { protocol: "https", hostname: "ram-ji-bakery23.onrender.com", pathname: "/**" },
+      { protocol: "https", hostname: "ram-ji-bakery-43-public-1.onrender.com", pathname: "/**" },
       // Alternative production backend (your-backend-domains)
       { protocol: "https", hostname: "bakery-api.onrender.com", pathname: "/**" },
       // Cloudinary

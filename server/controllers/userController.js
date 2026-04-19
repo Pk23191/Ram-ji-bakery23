@@ -15,7 +15,7 @@ function buildAppUrl(path = "") {
 }
 
 function buildApiUrl(path = "") {
-  const base = process.env.PUBLIC_API_URL || "https://ram-ji-bakery23.onrender.com/api";
+  const base = process.env.PUBLIC_API_URL || "https://ram-ji-bakery-43-public-1.onrender.com/api";
   return `${base}${path}`;
 }
 

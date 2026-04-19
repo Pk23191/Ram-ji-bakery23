@@ -64,7 +64,7 @@ export const getImageUrl = (image = "") => {
     const apiBase =
       process.env.NEXT_PUBLIC_API_URL ||
       process.env.VITE_API_URL ||
-      "https://ram-ji-bakery23.onrender.com/api";
+      "https://ram-ji-bakery-43-public-1.onrender.com/api";
     const backendBase = apiBase.replace(/\/api\/?$/, "");
     return `${backendBase}${value}`;
   }

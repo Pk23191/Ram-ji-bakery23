@@ -9,5 +9,7 @@ server/data/*.json
 !server/data/*.sample.json
 server/data/*.bak.*
 client/.next
+.vercel/
+client/.vercel/
 server/uploads/*
 !server/uploads/.gitkeep
