@@ -1,5 +1,5 @@
 import { LoaderCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import Seo from "../components/Seo";
 import SectionHeader from "../components/SectionHeader";
@@ -11,9 +11,59 @@ export default function TrackOrderPage() {
   const [query, setQuery] = useState("");
   const [cancelReason, setCancelReason] = useState("");
   const [isCancelling, setIsCancelling] = useState(false);
-  const { orders, updateOrderInState } = useShop();
+  const [isLoading, setIsLoading] = useState(false);
+  const [matchingOrder, setMatchingOrder] = useState(null);
+  const { orders, updateOrderInState, customerSession } = useShop();
 
-  const matchingOrder = orders.find((order) => order.id.toLowerCase() === query.toLowerCase());
+  const getCustomerHeaders = () =>
+    customerSession?.token
+      ? {
+          headers: {
+            Authorization: `Bearer ${customerSession.token}`
+          }
+        }
+      : {};
+
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setMatchingOrder(null);
+      return;
+    }
+
+    let active = true;
+
+    async function loadOrder() {
+      if (!customerSession?.token) {
+        const localMatch = orders.find((order) => order.id.toLowerCase() === trimmed.toLowerCase());
+        setMatchingOrder(localMatch || null);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const { data } = await api.get("/orders", {
+          params: { orderId: trimmed },
+          ...getCustomerHeaders()
+        });
+        if (!active) return;
+        setMatchingOrder(Array.isArray(data) ? data[0] || null : null);
+      } catch (error) {
+        if (active) {
+          toast.error(error.response?.data?.message || "Unable to load order");
+          setMatchingOrder(null);
+        }
+      } finally {
+        if (active) setIsLoading(false);
+      }
+    }
+
+    loadOrder();
+
+    return () => {
+      active = false;
+    };
+  }, [query, customerSession?.token, orders]);
 
   const handleCancel = async () => {
     if (!matchingOrder || !cancelReason.trim()) {
@@ -23,7 +73,8 @@ export default function TrackOrderPage() {
 
     try {
       setIsCancelling(true);
-      const { data } = await api.patch(`/order/${matchingOrder.id}/cancel`, {
+      const orderId = matchingOrder.orderId || matchingOrder.id;
+      const { data } = await api.patch(`/order/${orderId}/cancel`, {
         reason: cancelReason,
         cancelledBy: "customer"
       });
@@ -52,12 +103,17 @@ export default function TrackOrderPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          {matchingOrder ? (
+          {isLoading ? (
+            <div className="mt-6 flex items-center gap-2 text-sm text-mocha/70">
+              <LoaderCircle size={16} className="animate-spin" />
+              Loading order...
+            </div>
+          ) : matchingOrder ? (
             <div className="mt-6 rounded-[28px] bg-latte/30 p-6">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-caramel">Order ID</p>
-                  <p className="mt-1 font-heading text-3xl text-cocoa">{matchingOrder.id}</p>
+                  <p className="mt-1 font-heading text-3xl text-cocoa">{matchingOrder.orderId || matchingOrder.id}</p>
                 </div>
                 <span className={`rounded-full px-4 py-2 text-sm font-semibold ${getOrderStatusColor(matchingOrder.status)}`}>
                   {matchingOrder.status}

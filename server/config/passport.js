@@ -8,7 +8,7 @@ function configurePassport() {
   const clientID = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const callbackURL =
-    process.env.GOOGLE_CALLBACK_URL || "https://ram-ji-bakery23.onrender.com/api/auth/google/callback";
+    process.env.GOOGLE_CALLBACK_URL || "https://ram-ji-bakery-43-public-1.onrender.com/api/auth/google/callback";
 
   if (!clientID || !clientSecret) {
     return { enabled: false };

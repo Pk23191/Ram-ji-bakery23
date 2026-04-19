@@ -1,0 +1,9 @@
+[
+  {
+    "id": "admin-demo-001",
+    "email": "admin@ramjibakery.in",
+    "password": "$2a$10$demoHashedAdminPassword",
+    "role": "superadmin",
+    "createdAt": "2026-04-14T10:00:00.000Z"
+  }
+]

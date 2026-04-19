@@ -191,7 +191,7 @@ async function forgotPassword(req, res) {
 
     await writeJson(USERS_FILE, users);
 
-    const resetLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/reset-password/${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL || "https://ram-ji-bakery23.vercel.app"}/reset-password/${resetToken}`;
     console.log("Password reset token generated:", { email, resetToken, resetTokenExpires });
 
     return res.json({

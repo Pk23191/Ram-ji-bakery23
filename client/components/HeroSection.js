@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import api from "../utils/api";
 
 export default function HeroSection() {
-  const [logoSrc, setLogoSrc] = useState("/logo.png");
+  const [logoSrc, setLogoSrc] = useState("/logo.svg");
   const [banner, setBanner] = useState(null);
 
   useEffect(() => {
@@ -93,7 +93,7 @@ export default function HeroSection() {
                     fill
                     className="object-contain relative"
                     priority
-                    onError={() => setLogoSrc("/cake-placeholder.png")}
+                    onError={() => setLogoSrc("/images/cake1.jpg")}
                   />
                 </>
               )}

@@ -37,8 +37,10 @@ async function createOrder(req, res) {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
+
     orders.unshift(order);
     await writeJson(ORDERS_FILE, orders);
+
     let whatsappUrl = "";
     let emailStatus = { skipped: true };
 
@@ -49,18 +51,18 @@ async function createOrder(req, res) {
           const qty = Number(item.quantity || 1);
           const price = Number(item.price || 0);
           const image = item.image ? ` | ${item.image}` : "";
-          return `- ${item.name || "Product"} x${qty} (₹${price})${image}`;
+          return `- ${item.name || "Product"} x${qty} (Rs. ${price})${image}`;
         })
         .join("\n");
 
       const message = [
-        "New Order 🧁",
+        "New Order - Ramji Bakery",
         `Order ID: ${order.orderId}`,
         `Customer: ${order.customer}`,
         `Phone: ${order.phone}`,
         order.address ? `Address: ${order.address}` : null,
         itemsLine ? `Items:\n${itemsLine}` : "Items: -",
-        `Total: ₹${order.total}`
+        `Total: Rs. ${order.total}`
       ]
         .filter(Boolean)
         .join("\n");
@@ -93,12 +95,15 @@ async function getOrders(req, res) {
     const isAdmin = ["admin", "superadmin"].includes(req.user?.role || "");
     const email = isAdmin ? req.query.email || "" : req.user?.email || req.query.email || "";
     const phone = isAdmin ? req.query.phone || "" : req.user?.phone || req.query.phone || "";
+    const orderId = String(req.query.orderId || req.query.id || "").trim();
 
-    const filtered = email
-      ? orders.filter((order) => order.customerEmail === email)
-      : phone
-        ? orders.filter((order) => order.phone === phone)
-        : orders;
+    const filtered = orderId
+      ? orders.filter((order) => order.orderId === orderId || order.id === orderId)
+      : email
+        ? orders.filter((order) => order.customerEmail === email)
+        : phone
+          ? orders.filter((order) => order.phone === phone)
+          : orders;
 
     return res.json(filtered);
   } catch (error) {

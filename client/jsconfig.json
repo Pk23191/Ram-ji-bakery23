@@ -1,5 +1,11 @@
 {
   "compilerOptions": {
-    "baseUrl": "."
-  }
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "exclude": ["node_modules", ".next"]
 }

@@ -1,0 +1,9 @@
+[
+  {
+    "id": "banner-demo-001",
+    "title": "Homepage Banner",
+    "image": "https://example.com/banner.jpg",
+    "isActive": true,
+    "createdAt": "2026-04-14T10:00:00.000Z"
+  }
+]

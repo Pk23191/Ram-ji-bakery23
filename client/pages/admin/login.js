@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import Seo from "../../components/Seo";
 import { useShop } from "../../context/ShopContext";
@@ -58,6 +59,12 @@ export default function AdminLoginPage() {
           <button className="btn-primary w-full" disabled={isLoggingIn}>
             {isLoggingIn ? "Signing in..." : "Login"}
           </button>
+          
+          <div className="text-center">
+            <Link href="/admin/super-login" className="text-[10px] text-mocha/40 uppercase tracking-widest hover:text-purple-500 transition">
+              System Administrator? Access Master Terminal
+            </Link>
+          </div>
         </form>
       </section>
     </>

@@ -6,7 +6,7 @@ import { categories, categoryLabels, normalizeCategory } from "../data/site";
 import useProducts from "../hooks/useProducts";
 
 export default function MenuPage() {
-  const { products, isLoading, error } = useProducts();
+  const { products, isLoading, error } = useProducts("", { limit: 20, page: 1 });
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
   const [priceFilter, setPriceFilter] = useState("All");

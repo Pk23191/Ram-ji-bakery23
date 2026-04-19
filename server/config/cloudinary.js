@@ -49,6 +49,8 @@ if (isCloudinaryConfigured()) {
     api_secret: process.env.CLOUDINARY_API_SECRET,
     secure: true
   });
+} else {
+  console.error("Cloudinary not configured");
 }
 
 function assertCloudinaryConfigured() {

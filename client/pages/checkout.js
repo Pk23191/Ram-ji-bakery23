@@ -63,7 +63,6 @@ export default function CheckoutPage() {
       couponCode: coupon?.code || "",
       total: pricing.total,
       behaviorTags: cart.flatMap((item) => [item.category, item.customizations?.flavor].filter(Boolean)),
-      total: pricing.total,
       items: cart.map((item) => ({
         productId: item._id,
         name: item.name,

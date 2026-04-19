@@ -1,8 +1,10 @@
-import { useRef } from "react";
-import { CakeSlice, ImagePlus, Palette, Sparkles } from "lucide-react";
+import { useRef, useState } from "react";
+import { CakeSlice, ImagePlus, Palette, Sparkles, Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 import Seo from "../components/Seo";
 import SectionHeader from "../components/SectionHeader";
 import { useShop } from "../context/ShopContext";
+import api from "../utils/api";
 import { defaultCustomization } from "../data/site";
 
 const customCakeProduct = {
@@ -15,15 +17,48 @@ const customCakeProduct = {
 export default function CustomizeCakePage() {
   const fileInputRef = useRef(null);
   const { customCake, setCustomCake, addToCart } = useShop();
+  const [customImageFile, setCustomImageFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const updateField = (field, value) => setCustomCake((prev) => ({ ...prev, [field]: value }));
 
   const handleImageUpload = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    setCustomImageFile(file);
     const reader = new FileReader();
     reader.onloadend = () => updateField("imagePreview", reader.result);
     reader.readAsDataURL(file);
+  };
+
+  const handleAddToCart = async () => {
+    if (customImageFile) {
+      setIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append("image", customImageFile);
+        
+        const { data } = await api.post("/upload/single", formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+        
+        const secureUrl = data.secure_url || data.url;
+        
+        const customizations = { ...customCake };
+        delete customizations.imagePreview; // Remove the heavy base64
+        
+        addToCart({ ...customCakeProduct, customImage: secureUrl, image: secureUrl }, 1, customizations);
+        setCustomImageFile(null);
+        setCustomCake(defaultCustomization);
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Failed to upload image. Please try again.");
+      } finally {
+        setIsUploading(false);
+      }
+    } else {
+      addToCart(customCakeProduct, 1, customCake);
+      setCustomCake(defaultCustomization);
+    }
   };
 
   return (
@@ -93,10 +128,15 @@ export default function CustomizeCakePage() {
             </div>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <button className="btn-primary" onClick={() => addToCart(customCakeProduct, 1, customCake)}>
-                Add Customized Cake
+              <button disabled={isUploading} className="btn-primary" onClick={handleAddToCart}>
+                {isUploading ? <Loader2 className="mr-2 animate-spin" size={16} /> : null}
+                {isUploading ? "Uploading image & Adding..." : "Add Customized Cake"}
               </button>
-              <button className="btn-secondary" onClick={() => setCustomCake(defaultCustomization)}>
+              <button className="btn-secondary" onClick={() => {
+                  setCustomCake(defaultCustomization);
+                  setCustomImageFile(null);
+                  if (fileInputRef.current) fileInputRef.current.value = "";
+              }}>
                 Reset Builder
               </button>
             </div>

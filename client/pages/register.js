@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
 import Seo from "../components/Seo";
@@ -16,10 +16,11 @@ export default function RegisterPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (customerSession?.token && customerSession?.email) {
-    router.replace("/account");
-    return null;
-  }
+  useEffect(() => {
+    if (customerSession?.token && customerSession?.email) {
+      router.replace("/account");
+    }
+  }, [customerSession?.token, customerSession?.email, router]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();

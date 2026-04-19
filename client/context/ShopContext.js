@@ -9,16 +9,7 @@ const ShopContext = createContext();
 export function ShopProvider({ children }) {
   const [cart, setCart] = useState([]);
   const [userPreferences, setUserPreferences] = useState([]);
-  const [orders, setOrders] = useState([
-    {
-      id: "RB1024",
-      customer: "Priya Sharma",
-      status: "Pending",
-      total: 1548,
-      createdAt: "2026-03-17",
-      cancelReason: ""
-    }
-  ]);
+  const [orders, setOrders] = useState([]);
   const [customCake, setCustomCake] = useState(defaultCustomization);
   const [adminToken, setAdminToken] = useState("");
   const [adminUser, setAdminUser] = useState(null);

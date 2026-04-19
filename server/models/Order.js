@@ -18,6 +18,7 @@ const orderSchema = new mongoose.Schema(
         productId: String,
         name: String,
         image: String,
+        customImage: { type: String, default: "" },
         category: String,
         quantity: Number,
         price: Number,

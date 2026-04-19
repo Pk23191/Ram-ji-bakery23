@@ -5,8 +5,14 @@ require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
 require("express-async-errors");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
+const compression = require("compression");
 const express = require("express");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const mongoSanitize = require("express-mongo-sanitize");
+const mongoose = require("mongoose");
 
+const connectDB = require("../config/db");
 const contactRoutes = require("./contactRoutes");
 const productRoutes = require("./productRoutes");
 const fileAuthRoutes = require("./fileAuthRoutes");
@@ -20,12 +26,42 @@ const { getCloudinaryConfigError } = require("../config/cloudinary");
 const uploadRoutes = require("./upload");
 const uploadLegacyRoutes = require("./uploadRoutes");
 const bannerRoutes = require("./bannerRoutes");
+const imageRoutes = require("./imageRoutes");
 const { readJson, writeJson } = require("../utils/fileStore");
 
 const app = express();
 let server;
 
 app.set("trust proxy", 1);
+
+// Security middleware
+app.use(helmet());
+app.use(
+  mongoSanitize({
+    replaceWith: "_"
+  })
+);
+
+// Basic API rate limiter
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // limit each IP to 200 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// Tighter limiter for auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { message: "Too many auth attempts, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+// Apply rate limiters
+app.use("/api/", apiLimiter);
+app.use("/api/auth", authLimiter);
 
 // Core middleware for API requests and media uploads.
 const allowedOrigins = [
@@ -40,20 +76,29 @@ app.use(
     origin(origin, cb) {
       // Allow requests with no origin (mobile apps, Postman, server-to-server)
       if (!origin) return cb(null, true);
+
       // Allow any localhost for development
       if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return cb(null, true);
+
+      // Explicit allow-list (use FRONTEND_URL / PUBLIC_STORE_URL env vars)
       if (allowedOrigins.includes(origin)) return cb(null, true);
-      // Allow any *.vercel.app preview deploys
+
+      // Allow Vercel preview domains
       if (/\.vercel\.app$/.test(origin)) return cb(null, true);
-      return cb(null, true); // fallback: allow all for now
+
+      // Otherwise reject CORS (safer in production)
+      return cb(new Error("CORS not allowed for origin: " + origin), false);
     },
-    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Authorization"],
+    optionsSuccessStatus: 200
   })
 );
 app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+// Enable gzip/deflate compression for API responses to reduce payload size
+app.use(compression());
 // Serve uploaded static files from the project root `uploads/` directory.
 // Using process.cwd() makes the path consistent when running from different working dirs.
 app.use(
@@ -74,16 +119,19 @@ app.use("/api/coupons", fileCouponRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/uploads", uploadLegacyRoutes);
 app.use("/api/banner", bannerRoutes);
+app.use("/api/images", imageRoutes);
 
 app.get("/api/health", (req, res) => {
-  res.json({ ok: true, service: "Ramji Bakery API", dbConnected: false, readyState: 0 });
+  const readyState = mongoose.connection.readyState;
+  res.json({ ok: true, service: "Ramji Bakery API", dbConnected: readyState === 1, readyState });
 });
 
 app.get("/api/test-db", (req, res) => {
+  const readyState = mongoose.connection.readyState;
   res.json({
-    ok: true,
-    dbConnected: false,
-    readyState: 0
+    ok: readyState === 1,
+    dbConnected: readyState === 1,
+    readyState
   });
 });
 
@@ -91,36 +139,43 @@ app.use(["/api/settings"], (req, res) => {
   res.status(501).json({ message: "MongoDB has been removed from this project. These endpoints are disabled." });
 });
 
+// 404 handler for non-matching routes
 app.use((req, res) => {
+  // Enhanced logging to identify mismatched routes
+  console.log(`404 NOT FOUND: ${req.method} ${req.path}`);
+  
   // If this looks like an API or uploads request, return JSON 404.
   if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) {
-    return res.status(404).json({ message: "Route not found" });
+    return res.status(404).json({ ok: false, message: "Route not found" });
   }
 
-  // For browser navigation requests, redirect to the frontend store URL
-  // so client-side routing (Next.js) can handle the route. Use PUBLIC_STORE_URL
-  // or FRONTEND_URL environment variables if provided, otherwise default to
-  // localhost:3000 which is the local Next dev server.
+  // For browser navigation requests, redirect to the frontend store URL so Next.js can handle client routing.
   const frontendUrl = process.env.PUBLIC_STORE_URL || process.env.FRONTEND_URL || "https://ram-ji-bakery.vercel.app";
 
   if (req.accepts("html")) {
-    // Preserve the original path so the frontend can handle it.
-    const target = frontendUrl.replace(/\/$/, "") + req.originalUrl;
-    return res.redirect(target);
+    const isLocal = req.hostname === "localhost" || req.hostname === "127.0.0.1";
+    if (isLocal) {
+      // Don't redirect on localhost so we can see the backend status page/routes if needed.
+    } else {
+      const target = frontendUrl.replace(/\/$/, "") + req.originalUrl;
+      return res.redirect(target);
+    }
   }
 
   // Fallback to JSON for non-HTML clients.
-  res.status(404).json({ message: "Route not found" });
+  res.status(404).json({ ok: false, message: "Route not found" });
 });
 
 // Unified error handler for cleaner production responses.
 app.use((error, req, res, next) => {
-  console.error(error);
-  res.status(500).json({ message: error.message || "Server error" });
+  const status = error?.statusCode || error?.status || 500;
+  const message = error?.message || "Server error";
+  console.error("ERROR_HANDLER:", { status, message, stack: error?.stack });
+  res.status(status).json({ ok: false, message });
 });
 
 const PORT = process.env.PORT || 5000;
-const ADMINS_FILE = path.join(__dirname, "data", "admins.json");
+const ADMINS_FILE = path.join(__dirname, "..", "data", "admins.json");
 
 async function ensureDefaultAdmin() {
   try {
@@ -177,7 +232,23 @@ function registerShutdownHandlers() {
 }
 
 async function startServer() {
+  // Fail fast if JWT_SECRET is missing in production
+  if (!process.env.JWT_SECRET) {
+    if (process.env.NODE_ENV === "production") {
+      console.error("❌ FATAL: JWT_SECRET is not set. Authentication will fail for all users.");
+      console.error("   Set JWT_SECRET in your Render environment variables.");
+    } else {
+      console.warn("⚠️  JWT_SECRET is not set — using dev fallback. Never do this in production!");
+    }
+  }
+
   await ensureDefaultAdmin();
+
+  try {
+    await connectDB();
+  } catch (error) {
+    console.error("MongoDB connection failed. Image persistence will be unavailable until this is fixed.");
+  }
 
   const cloudinaryError = getCloudinaryConfigError();
   if (cloudinaryError) {
@@ -185,6 +256,26 @@ async function startServer() {
   } else {
     console.log("Cloudinary configured successfully.");
   }
+
+  // --- Setup Env Validations ---
+  const requiredEnv = [
+    "MONGO_URI",
+    "JWT_SECRET",
+    "CLOUDINARY_CLOUD_NAME",
+    "CLOUDINARY_API_KEY",
+    "CLOUDINARY_API_SECRET"
+  ];
+
+  requiredEnv.forEach((key) => {
+    if (!process.env[key]) {
+      console.error(`❌ Missing ENV: ${key}`);
+    } else {
+      console.log(`✅ ENV OK: ${key}`);
+    }
+  });
+
+  console.log("🚀 Server running");
+  console.log("🌍 Mode:", process.env.NODE_ENV || "development");
 
   server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 

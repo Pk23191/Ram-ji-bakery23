@@ -5,7 +5,7 @@ import useProducts from "../hooks/useProducts";
 import { formatCurrency } from "../utils/helpers";
 
 export default function CakesPage() {
-  const { products, isLoading, error } = useProducts("cake");
+  const { products, isLoading, error } = useProducts("cake", { limit: 24, page: 1 });
 
   return (
     <>

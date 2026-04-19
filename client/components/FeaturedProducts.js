@@ -25,16 +25,15 @@ export default function FeaturedProducts() {
         </Link>
       </div>
       {error ? (
-        <div className="glass-panel border border-rose/20 bg-rose/5 p-5 text-sm text-rose-700">{error}</div>
-      ) : (
-        <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {products.slice(0, 8).map((product) => (
-            <div key={product._id} className="rounded-2xl transition hover:scale-[1.02]">
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </div>
-      )}
+        <div className="glass-panel mb-6 border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">{error}</div>
+      ) : null}
+      <div className="grid gap-4 sm:gap-6 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {products.slice(0, 8).map((product) => (
+          <div key={product._id} className="rounded-2xl transition hover:scale-[1.02]">
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

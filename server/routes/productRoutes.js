@@ -1,6 +1,7 @@
 const express = require("express");
 const { memoryUpload } = require("../utils/upload");
 const { handleUploadError } = require("../controllers/uploadController");
+const { validateProductInput } = require("../middleware/validateInput");
 const auth = require("../middleware/auth");
 const adminMiddleware = require("../middleware/adminMiddleware");
 const {
@@ -27,9 +28,9 @@ function runProductUpload(req, res, next) {
 
 router.get("/", getProducts);
 router.get("/:id", getProductById);
-router.post("/add", auth, adminMiddleware, runProductUpload, createProduct);
-router.post("/", auth, adminMiddleware, runProductUpload, createProduct);
-router.put("/:id", auth, adminMiddleware, runProductUpload, updateProduct);
+router.post("/add", auth, adminMiddleware, runProductUpload, validateProductInput, createProduct);
+router.post("/", auth, adminMiddleware, runProductUpload, validateProductInput, createProduct);
+router.put("/:id", auth, adminMiddleware, runProductUpload, validateProductInput, updateProduct);
 router.delete("/:id", auth, adminMiddleware, deleteProduct);
 
 module.exports = router;
